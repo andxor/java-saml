@@ -28,14 +28,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import com.onelogin.saml2.model.CessionarioCommittente;
+import com.onelogin.saml2.model.*;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.onelogin.saml2.exception.Error;
-import com.onelogin.saml2.model.Contact;
-import com.onelogin.saml2.model.KeyStoreSettings;
-import com.onelogin.saml2.model.Organization;
 import com.onelogin.saml2.util.Constants;
 import com.onelogin.saml2.util.Util;
 
@@ -93,6 +90,19 @@ public class SettingsBuilder {
 	public final static String SP_CONTACT_CESSIONARIO_COMMITTENTE_HQ_POSTAL_CODE_PROPERTY_KEY_PREFIX = "cessionario_committente.hq.postal_code";
 	public final static String SP_CONTACT_CESSIONARIO_COMMITTENTE_HQ_CITY__PROPERTY_KEY_PREFIX = "cessionario_committente.hq.city";
 	public final static String SP_CONTACT_CESSIONARIO_COMMITTENTE_HQ_COUNTY_PROPERTY_KEY_PREFIX = "cessionario_committente.hq.county";
+
+	public final static String SP_ATTRIBUTE_CONSUMING_SERVICE_PROPERTY_KEY_PREFIX = "onelogin.saml2.sp.attribute_consuming_service";
+	public final static String SP_ATTRIBUTE_CONSUMING_SERVICE_NAME_PROPERTY_KEY_SUFFIX = "name";
+	public final static String SP_ATTRIBUTE_CONSUMING_SERVICE_DESCRIPTION_PROPERTY_KEY_SUFFIX = "description";
+	public final static String SP_ATTRIBUTE_CONSUMING_SERVICE_LANG_PROPERTY_KEY_SUFFIX = "lang";
+	public final static String SP_ATTRIBUTE_CONSUMING_SERVICE_DEFAULT_PROPERTY_KEY_SUFFIX = "default";
+
+	public final static String SP_ATTRIBUTE_CONSUMING_SERVICE_ATTRIBUTE_PROPERTY_KEY_PREFIX = "attribute";
+	public final static String SP_ATTRIBUTE_CONSUMING_SERVICE_ATTRIBUTE_NAME_PROPERTY_KEY_SUFFIX = "name";
+	public final static String SP_ATTRIBUTE_CONSUMING_SERVICE_ATTRIBUTE_NAME_FORMAT_PROPERTY_KEY_SUFFIX = "name_format";
+	public final static String SP_ATTRIBUTE_CONSUMING_SERVICE_ATTRIBUTE_FRIENDLY_NAME_PROPERTY_KEY_SUFFIX = "friendly_name";
+	public final static String SP_ATTRIBUTE_CONSUMING_SERVICE_ATTRIBUTE_REQUIRED_PROPERTY_KEY_SUFFIX = "required";
+	public final static String SP_ATTRIBUTE_CONSUMING_SERVICE_ATTRIBUTE_VALUE_PROPERTY_KEY_PREFIX = "value";
 
 
 	// KeyStore
@@ -311,6 +321,81 @@ public class SettingsBuilder {
 		}
 
 		return saml2Setting;
+	}
+
+	/**
+	 * Loads the Attribute Consuming Services from settings.
+	 *
+	 * @return a list containing the loaded Attribute Consuming Services
+	 */
+	private List<AttributeConsumingService> loadAttributeConsumingServices() {
+		// first split properties into a map of properties
+		// key = service index; value = service properties
+		final SortedMap<Integer, Map<String, Object>> acsProps =
+				extractIndexedProperties(SP_ATTRIBUTE_CONSUMING_SERVICE_PROPERTY_KEY_PREFIX, samlData);
+		// then build each Attribute Consuming Service
+		if(acsProps.containsKey(-1) && acsProps.size() == 1)
+			// single service specified; use index 1 for backward compatibility
+			return Arrays.asList(loadAttributeConsumingService(acsProps.get(-1), 1));
+		else
+			// multiple indexed services specified
+			return acsProps.entrySet().stream()
+					// ignore non-indexed service
+					.filter(entry -> {
+						final boolean indexed = entry.getKey() != -1;
+						if(!indexed) {
+							LOGGER.warn("non indexed Attribute Consuming Service found along with other indexed Services; the non-indexed one will be ignored");
+						}
+						return indexed;
+					})
+					.map(entry -> loadAttributeConsumingService(entry.getValue(), entry.getKey()))
+					.collect(Collectors.toList());
+	}
+
+	/**
+	 * Loads a single Attribute Consuming Service from settings.
+	 *
+	 * @param acsProps
+	 *              a map containing the Attribute Consuming Service settings
+	 * @param index
+	 *              the index to be set on the returned Attribute Consuming Service
+	 * @return the loaded Attribute Consuming Service
+	 */
+	private AttributeConsumingService loadAttributeConsumingService(Map<String, Object> acsProps, int index) {
+		final String serviceName =  loadStringProperty(SP_ATTRIBUTE_CONSUMING_SERVICE_NAME_PROPERTY_KEY_SUFFIX, acsProps);
+		final String serviceDescription = loadStringProperty(SP_ATTRIBUTE_CONSUMING_SERVICE_DESCRIPTION_PROPERTY_KEY_SUFFIX, acsProps);
+		final String lang = loadStringProperty(SP_ATTRIBUTE_CONSUMING_SERVICE_LANG_PROPERTY_KEY_SUFFIX, acsProps);
+		final Boolean isDefault = loadBooleanProperty(SP_ATTRIBUTE_CONSUMING_SERVICE_DEFAULT_PROPERTY_KEY_SUFFIX, acsProps);
+		final AttributeConsumingService acs = new AttributeConsumingService(index, isDefault, serviceName, serviceDescription, lang);
+		// split properties into a map of properties
+		// key = attribute index; value = attribute properties
+		final SortedMap<Integer, Map<String, Object>> attributeProps = extractIndexedProperties(SP_ATTRIBUTE_CONSUMING_SERVICE_ATTRIBUTE_PROPERTY_KEY_PREFIX, acsProps);
+		// build attributes
+		attributeProps.forEach((attributeIndex, attributeData) -> {
+			acs.addRequestedAttribute(loadRequestedAttribute(attributeData));
+		});
+		return acs;
+	}
+
+	/**
+	 * Loads a requested attribute from settings.
+	 *
+	 * @param attributeProps
+	 *              a map containing the attribute settings
+	 * @return the loaded attribute
+	 */
+	private RequestedAttribute loadRequestedAttribute(Map<String, Object> attributeProps) {
+		final String name = loadStringProperty(SP_ATTRIBUTE_CONSUMING_SERVICE_ATTRIBUTE_NAME_PROPERTY_KEY_SUFFIX, attributeProps);
+		final String nameFormat = loadStringProperty(SP_ATTRIBUTE_CONSUMING_SERVICE_ATTRIBUTE_NAME_FORMAT_PROPERTY_KEY_SUFFIX, attributeProps);
+		final String friendlyName = loadStringProperty(SP_ATTRIBUTE_CONSUMING_SERVICE_ATTRIBUTE_FRIENDLY_NAME_PROPERTY_KEY_SUFFIX, attributeProps);
+		final Boolean required = loadBooleanProperty(SP_ATTRIBUTE_CONSUMING_SERVICE_ATTRIBUTE_REQUIRED_PROPERTY_KEY_SUFFIX, attributeProps);
+		// split properties into a map of properties
+		// key = value index; value = the actual value
+		final SortedMap<Integer, Object> values = extractIndexedValues(SP_ATTRIBUTE_CONSUMING_SERVICE_ATTRIBUTE_VALUE_PROPERTY_KEY_PREFIX, attributeProps);
+		final List<String> stringValues = values.values().stream()
+				.map(value -> isString(value) ? StringUtils.trimToNull((String) value) : null)
+				.filter(Objects::nonNull).collect(Collectors.toList());
+		return new RequestedAttribute(name, friendlyName, required, nameFormat, stringValues);
 	}
 
 	/**
@@ -761,6 +846,13 @@ public class SettingsBuilder {
 			saml2Setting.setSpNameIDFormat(spNameIDFormat);
 		}
 
+		List<AttributeConsumingService> attributeConsumingServices = loadAttributeConsumingServices();
+		if (attributeConsumingServices.size() == 1 && attributeConsumingServices.get(0) != null) {
+			attributeConsumingServices.get(0).setDefault(true);
+		}
+		saml2Setting.setSpAttributeConsumingServices(attributeConsumingServices);
+
+
 		boolean keyStoreEnabled = this.samlData.get(KEYSTORE_KEY) != null && this.samlData.get(KEYSTORE_ALIAS) != null
 				&& this.samlData.get(KEYSTORE_KEY_PASSWORD) != null;
 
@@ -819,15 +911,21 @@ public class SettingsBuilder {
 		return null;
 	}
 
+	private Boolean loadBooleanProperty(String propertyKey) {
+		Object propValue = samlData.get(propertyKey);
+		return loadBooleanProperty(propertyKey, samlData);
+	}
+
 	/**
-	 * Loads a property of the type Boolean from the Properties object
+	 * Loads a property of the type Boolean from the specified data
 	 *
 	 * @param propertyKey the property name
+	 * @param data the input data
 	 *
 	 * @return the value
 	 */
-	private Boolean loadBooleanProperty(String propertyKey) {
-		Object propValue = samlData.get(propertyKey);
+	private Boolean loadBooleanProperty(String propertyKey, Map<String, Object> data) {
+		Object propValue = data.get(propertyKey);
 		if (isString(propValue)) {
 			return Boolean.parseBoolean(((String) propValue).trim());
 		}

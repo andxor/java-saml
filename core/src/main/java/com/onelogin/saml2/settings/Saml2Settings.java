@@ -10,6 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import com.onelogin.saml2.model.AttributeConsumingService;
 import com.onelogin.saml2.model.hsm.HSM;
 
 import org.apache.commons.lang3.StringUtils;
@@ -49,6 +50,8 @@ public class Saml2Settings {
 	private X509Certificate spX509certNew = null;
 	private PrivateKey spPrivateKey = null;
 	private HSM hsm = null;
+	private List<AttributeConsumingService> spAttributeConsumingServices = new ArrayList<>();
+
 
 	// IdP
 	private String idpEntityId = "";
@@ -96,6 +99,8 @@ public class Saml2Settings {
 	private Organization organization = null;
 
 	private boolean spValidationOnly = false;
+
+
 
 	/**
 	 * @return the strict setting value
@@ -927,6 +932,64 @@ public class Saml2Settings {
 	}
 
 	/**
+	 * @return the SP Attribute Consuming Services
+	 */
+
+	public List<AttributeConsumingService> getSpAttributeConsumingServices() {
+		return spAttributeConsumingServices;
+	}
+
+	/**
+	 * Set the Attribute Consuming Services to be declared in the Service Provider
+	 * metadata
+	 *
+	 * @param spAttributeConsumingServices
+	 *              the Attribute Consuming Services to set
+	 */
+	public void setSpAttributeConsumingServices(List<AttributeConsumingService> spAttributeConsumingServices) {
+		this.spAttributeConsumingServices = spAttributeConsumingServices;
+	}
+
+
+	/*
+	 * Auxiliary method to check Attribute Consuming Services are properly
+	 * configured.
+	 *
+	 * @param errors the list to add to when an error is encountered
+	 */
+	private void checkAttributeConsumingServices(List<String> errors) {
+		List<AttributeConsumingService> attributeConsumingServices = getSpAttributeConsumingServices();
+		if(!attributeConsumingServices.isEmpty()) {
+			String errorMsg;
+			// all Attribute Consuming Services must have a service name
+			if(attributeConsumingServices.stream().anyMatch(service -> StringUtils.isEmpty(service.getServiceName()))) {
+				errorMsg = "sp_attribute_consuming_service_not_enough_data";
+				errors.add(errorMsg);
+				LOGGER.error(errorMsg);
+			}
+			// all Attribute Consuming Services must have at least one requested attribute
+			if(attributeConsumingServices.stream().anyMatch(service -> service.getRequestedAttributes().isEmpty())) {
+				errorMsg = "sp_attribute_consuming_service_no_requested_attribute";
+				errors.add(errorMsg);
+				LOGGER.error(errorMsg);
+			}
+			// there must be at most one with default = true
+			if(attributeConsumingServices.stream().filter(service -> Boolean.TRUE.equals(service.isDefault())).count() > 1) {
+				errorMsg = "sp_attribute_consuming_service_multiple_defaults";
+				errors.add(errorMsg);
+				LOGGER.error(errorMsg);
+			}
+			// all requested attributes must have a name
+			if(attributeConsumingServices.stream().flatMap(service -> service.getRequestedAttributes().stream())
+					.anyMatch(attribute -> StringUtils.isEmpty(attribute.getName()))) {
+				errorMsg = "sp_attribute_consuming_service_not_enough_requested_attribute_data";
+				errors.add(errorMsg);
+				LOGGER.error(errorMsg);
+			}
+		}
+	}
+
+	/**
 	 * Checks the settings .
 	 *
 	 * @return errors found on the settings data
@@ -1051,6 +1114,8 @@ public class Saml2Settings {
 			errors.add(errorMsg);
 			LOGGER.error(errorMsg);
 		}
+
+		checkAttributeConsumingServices(errors);
 
 		if (this.getHsm() != null && this.getSPkey() != null) {
 			errorMsg = "use_either_hsm_or_private_key";
