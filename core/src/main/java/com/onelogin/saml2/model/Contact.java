@@ -40,6 +40,17 @@ public class Contact {
 	 */
 	private final List<String> telephoneNumbers;
 
+
+	private final String pivaAggregatore;
+
+	private final String fiscalCode;
+
+	private final CessionarioCommittente cessionarioCommittente;
+
+	public CessionarioCommittente getCessionarioCommittente() {
+		return cessionarioCommittente;
+	}
+
 	/**
 	 * Constructor to specify minimal contact data.
 	 * <p>
@@ -77,12 +88,21 @@ public class Contact {
 	 *              Contact phone numbers
 	 */
 	public Contact(String contactType, String company, String givenName, String surName, List<String> emailAddresses, List<String> telephoneNumbers) {
+		 this(contactType, company, givenName, surName, emailAddresses, telephoneNumbers, null, null, null);
+	}
+
+
+	public Contact(String contactType, String company, String givenName, String surName, List<String> emailAddresses,
+				   List<String> telephoneNumbers, String fiscalCode, String pIva, CessionarioCommittente cessionarioCommittente) {
 		this.contactType = contactType != null? contactType : "";
 		this.company = company;
 		this.givenName = givenName;
 		this.surName = surName;
 		this.emailAddresses = emailAddresses != null? emailAddresses: Collections.emptyList();
 		this.telephoneNumbers = telephoneNumbers != null? telephoneNumbers: Collections.emptyList();
+		this.fiscalCode = fiscalCode;
+		this.pivaAggregatore = pIva;
+		this.cessionarioCommittente = cessionarioCommittente;
 	}
 
 	/**
@@ -134,5 +154,13 @@ public class Contact {
 	 */
 	public final List<String> getTelephoneNumbers() {
 		return telephoneNumbers;
+	}
+
+	public String getPivaAggregatore() {
+		return pivaAggregatore;
+	}
+
+	public String getFiscalCode() {
+		return fiscalCode;
 	}
 }

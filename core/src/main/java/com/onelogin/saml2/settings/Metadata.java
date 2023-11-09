@@ -13,6 +13,7 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.security.PrivateKey;
 
+import com.onelogin.saml2.model.*;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.text.StrSubstitutor;
 import org.apache.xml.security.exceptions.XMLSecurityException;
@@ -20,10 +21,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
-import com.onelogin.saml2.model.Contact;
-import com.onelogin.saml2.model.Organization;
-import com.onelogin.saml2.model.AttributeConsumingService;
-import com.onelogin.saml2.model.RequestedAttribute;
 import com.onelogin.saml2.util.Constants;
 import com.onelogin.saml2.util.Util;
 
@@ -187,6 +184,7 @@ public class Metadata {
 		StringBuilder template = new StringBuilder();
 		template.append("<?xml version=\"1.0\"?>");
 		template.append("<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"");
+		template.append(" xmlns:spid=\"https://spid.gov.it/saml-extensions\"");
 		template.append("${validUntilTimeStr}");
 		template.append("${cacheDurationStr}");
 		template.append(" entityID=\"${spEntityId}\"");
@@ -266,6 +264,46 @@ public class Metadata {
 		return attributeConsumingServiceXML.toString();
 	}
 
+
+	private String getContactExtension(Contact contact) {
+		StringBuilder stringBuilder = new StringBuilder();
+		switch (contact.getContactType()) {
+			case "other": stringBuilder.append("<md:Extensions>")
+						.append("<spid:VATNumber>").append(Util.toXml(contact.getPivaAggregatore())).append("</spid:VATNumber>")
+						.append("<spid:FiscalCode>").append(Util.toXml(contact.getFiscalCode())).append("</spid:FiscalCode>")
+						.append("<spid:Private/>")
+						.append("</md:Extensions>");
+			case "billing":  {
+				CessionarioCommittente committente = contact.getCessionarioCommittente();
+				if (committente != null) {
+					stringBuilder
+							.append("<md:Extensions xmlns:fpa=\"https://spid.gov.it/invoicing-extensions\">")
+							.append("<fpa:CessionarioCommittente>")
+							.append("<fpa:DatiAnagrafici>")
+							.append("<fpa:IdFiscaleIVA>")
+							.append("<fpa:IdPaese>").append(committente.getCmIDCountry()).append("</fpa:IdPaese>")
+							.append("<fpa:IdCodice>").append(committente.getCmIDCode()).append("</fpa:IdCodice>")
+							.append("</fpa:IdFiscaleIVA>")
+							.append("<fpa:Anagrafica>")
+							.append("<fpa:Denominazione>").append(committente.getCmIDDenomination()).append("</fpa:Denominazione>")
+							.append("</fpa:Anagrafica>")
+							.append("</fpa:DatiAnagrafici>")
+							.append("<fpa:Sede>")
+							.append("<fpa:Indirizzo>").append(committente.getHqAddress()).append("</fpa:Indirizzo>")
+							.append("<fpa:NumeroCivico>").append(committente.getHqAddressNumber()).append("</fpa:NumeroCivico>")
+							.append("<fpa:CAP>").append(committente.getHqPostalCode()).append("</fpa:CAP>")
+							.append("<fpa:Comune>").append(committente.getHqCity()).append("</fpa:Comune>")
+							.append("<fpa:Provincia>").append(committente.getHqCounty()).append("</fpa:Provincia>")
+							.append("<fpa:Nazione>").append(committente.getCmIDCountry()).append("</fpa:Nazione>")
+							.append("</fpa:Sede>")
+							.append("</fpa:CessionarioCommittente>")
+							.append("</md:Extensions>");
+				}
+			}
+		}
+		return stringBuilder.toString();
+	}
+
 	/**
 	 * Generates the contact section of the metadata's template
 	 *
@@ -276,7 +314,8 @@ public class Metadata {
 		StringBuilder contactsXml = new StringBuilder();
 
 		for (Contact contact : contacts) {
-			contactsXml.append("<md:ContactPerson contactType=\"" + Util.toXml(contact.getContactType()) + "\">");
+			contactsXml.append("<md:ContactPerson contactType=\"" + Util.toXml(contact.getContactType()) + "\" spid:entityType=\"spid:aggregator\">");
+			contactsXml.append(getContactExtension(contact));
 			final String company = contact.getCompany();
 			if(company != null)
 				contactsXml.append("<md:Company>" + Util.toXml(company) + "</md:Company>");

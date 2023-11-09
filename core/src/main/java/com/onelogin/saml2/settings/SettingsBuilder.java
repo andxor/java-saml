@@ -28,6 +28,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import com.onelogin.saml2.model.CessionarioCommittente;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,6 +82,18 @@ public class SettingsBuilder {
 	public final static String SP_CONTACT_SUR_NAME_PROPERTY_KEY_SUFFIX = "sur_name";
 	public final static String SP_CONTACT_EMAIL_ADDRESS_PROPERTY_KEY_PREFIX = "email_address";
 	public final static String SP_CONTACT_TELEPHONE_NUMBER_PROPERTY_KEY_PREFIX = "telephone_number";
+	public final static String SP_CONTACT_VAT_NUMBER_PROPERTY_KEY_PREFIX = "vat_number";
+
+	public final static String SP_CONTACT_FISCAL_CODE_PROPERTY_KEY_PREFIX = "fiscal_code";
+	public final static String SP_CONTACT_CESSIONARIO_COMMITTENTE_REGISTRY_ID_COUNTRY_PROPERTY_KEY_PREFIX = "cessionario_committente.registry.id_country";
+	public final static String SP_CONTACT_CESSIONARIO_COMMITTENTE_REGISTRY_ID_CODE_PROPERTY_KEY_PREFIX = "cessionario_committente.registry.id_code";
+	public final static String SP_CONTACT_CESSIONARIO_COMMITTENTE_REGISTRY_DENOMINATION_PROPERTY_KEY_PREFIX = "cessionario_committente.registry.denomination";
+	public final static String SP_CONTACT_CESSIONARIO_COMMITTENTE_HQ_ADDRESS_PROPERTY_KEY_PREFIX = "cessionario_committente.hq.address";
+	public final static String SP_CONTACT_CESSIONARIO_COMMITTENTE_HQ_ADDRESS_NUMBER_PROPERTY_KEY_PREFIX = "cessionario_committente.hq.address_number";
+	public final static String SP_CONTACT_CESSIONARIO_COMMITTENTE_HQ_POSTAL_CODE_PROPERTY_KEY_PREFIX = "cessionario_committente.hq.postal_code";
+	public final static String SP_CONTACT_CESSIONARIO_COMMITTENTE_HQ_CITY__PROPERTY_KEY_PREFIX = "cessionario_committente.hq.city";
+	public final static String SP_CONTACT_CESSIONARIO_COMMITTENTE_HQ_COUNTY_PROPERTY_KEY_PREFIX = "cessionario_committente.hq.county";
+
 
 	// KeyStore
 	public final static String KEYSTORE_KEY = "onelogin.saml2.keystore.store";
@@ -541,7 +554,22 @@ public class SettingsBuilder {
 		// key = phone number index; value = phone numbers
 		final SortedMap<Integer, Object> phoneNumbers = extractIndexedValues(SP_CONTACT_TELEPHONE_NUMBER_PROPERTY_KEY_PREFIX, contactProps);
 		final List<String> numbers = toStringList(phoneNumbers);
-		return new Contact(contactType, company, givenName, surName, emails, numbers);
+	    final String vatNumber = loadStringProperty(SP_CONTACT_VAT_NUMBER_PROPERTY_KEY_PREFIX, contactProps);
+	    final String fiscalCode = loadStringProperty(SP_CONTACT_FISCAL_CODE_PROPERTY_KEY_PREFIX, contactProps);
+		CessionarioCommittente cessionarioCommittente = null;
+		if ("billing".equals(contactType)) {
+			final String cmIDCountry = loadStringProperty(SP_CONTACT_CESSIONARIO_COMMITTENTE_REGISTRY_ID_COUNTRY_PROPERTY_KEY_PREFIX, contactProps);
+			final String cmIDCode = loadStringProperty(SP_CONTACT_CESSIONARIO_COMMITTENTE_REGISTRY_ID_CODE_PROPERTY_KEY_PREFIX, contactProps);
+			final String cmIDDenomination = loadStringProperty(SP_CONTACT_CESSIONARIO_COMMITTENTE_REGISTRY_DENOMINATION_PROPERTY_KEY_PREFIX, contactProps);
+
+			final String hqAddress = loadStringProperty(SP_CONTACT_CESSIONARIO_COMMITTENTE_HQ_ADDRESS_PROPERTY_KEY_PREFIX, contactProps);
+			final String hqAddressNumber = loadStringProperty(SP_CONTACT_CESSIONARIO_COMMITTENTE_HQ_ADDRESS_NUMBER_PROPERTY_KEY_PREFIX, contactProps);
+			final String hqPostalCode = loadStringProperty(SP_CONTACT_CESSIONARIO_COMMITTENTE_HQ_POSTAL_CODE_PROPERTY_KEY_PREFIX, contactProps);
+			final String hqCity = loadStringProperty(SP_CONTACT_CESSIONARIO_COMMITTENTE_HQ_CITY__PROPERTY_KEY_PREFIX, contactProps);
+			final String hqCounty = loadStringProperty(SP_CONTACT_CESSIONARIO_COMMITTENTE_HQ_COUNTY_PROPERTY_KEY_PREFIX, contactProps);
+			cessionarioCommittente = new CessionarioCommittente(cmIDCountry, cmIDCode, cmIDDenomination, hqAddress, hqAddressNumber, hqPostalCode, hqCity, hqCounty);
+		}
+		return new Contact(contactType, company, givenName, surName, emails, numbers, vatNumber, fiscalCode, cessionarioCommittente);
 	}
 
 	/**
