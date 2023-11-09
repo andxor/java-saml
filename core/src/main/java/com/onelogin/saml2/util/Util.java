@@ -117,7 +117,7 @@ public final class Util {
 	public static final String RESPONSE_SIGNATURE_XPATH = "/samlp:Response/ds:Signature";
 	public static final String ASSERTION_SIGNATURE_XPATH = "/samlp:Response/saml:Assertion/ds:Signature";
 	/** Indicates if JAXP 1.5 support has been detected. */
-	private static boolean JAXP_15_SUPPORTED = isJaxp15Supported();
+	private static final boolean JAXP_15_SUPPORTED = isJaxp15Supported();
 
 	private static final Set<String> DEPRECATED_ALGOS = new HashSet<>(Arrays.asList(Constants.RSA_SHA1, Constants.DSA_SHA1));
 
@@ -680,7 +680,7 @@ public final class Util {
             ByteArrayOutputStream bytes = new ByteArrayOutputStream();
             copyBytes(new BufferedInputStream(is), bytes);
 
-            return bytes.toString("utf-8");
+            return bytes.toString(StandardCharsets.UTF_8);
         } finally {
             is.close();
         }
@@ -719,7 +719,7 @@ public final class Util {
 		    while(!decompresser.finished() && limit < 150) {
 		    	int resultLength = decompresser.inflate(result);
 		    	limit += 1;
-		    	inflated += new String(result, 0, resultLength, "UTF-8");
+		    	inflated += new String(result, 0, resultLength, StandardCharsets.UTF_8);
 		    }
 		    decompresser.end();
 		    return inflated;
@@ -742,7 +742,7 @@ public final class Util {
 		ByteArrayOutputStream bytesOut = new ByteArrayOutputStream();
 		Deflater deflater = new Deflater(Deflater.DEFLATED, true);
 		DeflaterOutputStream deflaterStream = new DeflaterOutputStream(bytesOut, deflater);
-		deflaterStream.write(input.getBytes(Charset.forName("UTF-8")));
+		deflaterStream.write(input.getBytes(StandardCharsets.UTF_8));
 		deflaterStream.finish();
 		// Base64 encoder
 		return new String(Base64.encodeBase64(bytesOut.toByteArray()));
@@ -806,13 +806,8 @@ public final class Util {
 	 */
 	public static String urlEncoder(String input) {
 		if (input != null) {
-			try {
-				return URLEncoder.encode(input, "UTF-8");
-			} catch (UnsupportedEncodingException e) {
-				LOGGER.error("URL encoder error.", e);
-				throw new IllegalArgumentException();
-			}
-		} else {
+            return URLEncoder.encode(input, StandardCharsets.UTF_8);
+        } else {
 			return null;
 		}
 	}
@@ -827,13 +822,8 @@ public final class Util {
 	 */
 	public static String urlDecoder(String input) {
 		if (input != null) {
-			try {
-				return URLDecoder.decode(input, "UTF-8");
-			} catch (UnsupportedEncodingException e) {
-				LOGGER.error("URL decoder error.", e);
-				throw new IllegalArgumentException();
-			}
-		} else {
+            return URLDecoder.decode(input, StandardCharsets.UTF_8);
+        } else {
 			return null;
 		}
 	}
@@ -982,7 +972,7 @@ public final class Util {
 							}
 						}
 					}
-					if (certMatches == false) {
+					if (!certMatches) {
 						LOGGER.warn("Certificate used in the document does not match any registered certificate");
 					}
 				}
@@ -1211,7 +1201,7 @@ public final class Util {
 						}
 					}
 				}
-				if (fingerprintMatches == false) {
+				if (!fingerprintMatches) {
 					LOGGER.warn("Fingerprint of the certificate used in the document does not match any registered fingerprints");
 				}
 			}
@@ -1635,7 +1625,7 @@ public final class Util {
 			if (statusEntry.getLength() != 1) {
 				throw new ValidationError("Missing Status on response", ValidationError.MISSING_STATUS);
 			}
-			NodeList codeEntry = Util.query(dom, statusXpath + "/samlp:StatusCode", (Element) statusEntry.item(0));
+			NodeList codeEntry = Util.query(dom, statusXpath + "/samlp:StatusCode", statusEntry.item(0));
 
 			if (codeEntry.getLength() == 0) {
 				throw new ValidationError("Missing Status Code on response", ValidationError.MISSING_STATUS_CODE);
@@ -1643,13 +1633,13 @@ public final class Util {
 			String stausCode = codeEntry.item(0).getAttributes().getNamedItem("Value").getNodeValue();
 			SamlResponseStatus status = new SamlResponseStatus(stausCode);
 
-			NodeList subStatusCodeEntry = Util.query(dom, statusXpath + "/samlp:StatusCode/samlp:StatusCode", (Element) statusEntry.item(0));
+			NodeList subStatusCodeEntry = Util.query(dom, statusXpath + "/samlp:StatusCode/samlp:StatusCode", statusEntry.item(0));
 			if (subStatusCodeEntry.getLength() > 0) {
 				String subStatusCode = subStatusCodeEntry.item(0).getAttributes().getNamedItem("Value").getNodeValue();
 				status.setSubStatusCode(subStatusCode);
 			}
 
-			NodeList messageEntry = Util.query(dom, statusXpath + "/samlp:StatusMessage", (Element) statusEntry.item(0));
+			NodeList messageEntry = Util.query(dom, statusXpath + "/samlp:StatusMessage", statusEntry.item(0));
 			if (messageEntry.getLength() == 1) {
 				status.setStatusMessage(messageEntry.item(0).getTextContent());
 			}
@@ -1973,20 +1963,12 @@ public final class Util {
 	}
 
 	private static String toStringUtf8(byte[] bytes) {
-		try {
-			return new String(bytes, "UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			throw new IllegalStateException(e);
-		}
-	}
+        return new String(bytes, StandardCharsets.UTF_8);
+    }
 
 	private static byte[] toBytesUtf8(String str) {
-		try {
-			return str.getBytes("UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			throw new IllegalStateException(e);
-		}
-	}
+        return str.getBytes(StandardCharsets.UTF_8);
+    }
 
 	private static Clock clock = Clock.systemUTC();
 

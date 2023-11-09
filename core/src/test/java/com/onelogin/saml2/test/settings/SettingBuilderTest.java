@@ -1,11 +1,7 @@
 package com.onelogin.saml2.test.settings;
 
 import static com.onelogin.saml2.settings.SettingsBuilder.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -764,7 +760,7 @@ public class SettingBuilderTest {
 		samlData.put(SECURITY_WANT_ASSERTIONS_ENCRYPTED, "true");
 		samlData.put(SECURITY_WANT_NAMEID, "false");
 		samlData.put(SECURITY_WANT_NAMEID_ENCRYPTED, "true");
-		samlData.put(SECURITY_REQUESTED_AUTHNCONTEXT, Arrays.asList("urn:oasis:names:tc:SAML:2.0:ac:classes:urn:oasis:names:tc:SAML:2.0:ac:classes:Password"));
+		samlData.put(SECURITY_REQUESTED_AUTHNCONTEXT, List.of("urn:oasis:names:tc:SAML:2.0:ac:classes:urn:oasis:names:tc:SAML:2.0:ac:classes:Password"));
 		samlData.put(SECURITY_REQUESTED_AUTHNCONTEXTCOMPARISON, "exact");
 		samlData.put(SECURITY_WANT_XML_VALIDATION, "true");
 		samlData.put(SECURITY_SIGNATURE_ALGORITHM, "http://www.w3.org/2001/04/xmldsig-more#rsa-sha512");
@@ -922,8 +918,8 @@ public class SettingBuilderTest {
 
 		assertNotNull(newCert);
 		assertNotNull(newKey);
-		assertFalse(previousCert.equals(newCert));
-		assertFalse(previousKey.equals(newKey));
+        assertNotEquals(previousCert, newCert);
+        assertNotEquals(previousKey, newKey);
 
 	}
 

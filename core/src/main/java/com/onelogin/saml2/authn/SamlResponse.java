@@ -1,6 +1,7 @@
 package com.onelogin.saml2.authn;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.time.Instant;
@@ -153,7 +154,7 @@ public class SamlResponse {
 	 * @throws ValidationError
 	 */
 	public void loadXmlFromBase64(String responseStr) throws ParserConfigurationException, XPathExpressionException, SAXException, IOException, SettingsException, ValidationError {
-		samlResponseString = new String(Util.base64decoder(responseStr), "UTF-8");
+		samlResponseString = new String(Util.base64decoder(responseStr), StandardCharsets.UTF_8);
 		samlResponseDocument = Util.loadXML(samlResponseString);
 
 		if (samlResponseDocument == null) {
@@ -411,7 +412,7 @@ public class SamlResponse {
 					Node notBefore = subjectConfirmationDataNodes.item(c).getAttributes().getNamedItem("NotBefore");
 					if (notBefore != null) {
 						Instant nb = Util.parseDateTime(notBefore.getNodeValue());
-						nb = ChronoUnit.SECONDS.addTo(nb, Constants.ALOWED_CLOCK_DRIFT * -1);
+						nb = ChronoUnit.SECONDS.addTo(nb, Constants.ALOWED_CLOCK_DRIFT * -1L);
 						if (Util.isAfterNow(nb)) {
 							validationIssues.add(new SubjectConfirmationIssue(i, "SubjectConfirmationData is not yet valid"));
 							continue;
@@ -618,7 +619,7 @@ public class SamlResponse {
 
 				attributes.put(attName, attrValues);
 			}
-			LOGGER.debug("SAMLResponse has attributes: " + attributes.toString());
+			LOGGER.debug("SAMLResponse has attributes: " + attributes);
 		} else {
 			LOGGER.debug("SAMLResponse has no attributes");
 		}
@@ -677,11 +678,7 @@ public class SamlResponse {
 	 */
 	public Boolean checkOneCondition() throws XPathExpressionException {
 		NodeList entries = this.queryAssertion("/saml:Conditions");
-		if (entries.getLength() == 1) {
-			return true;
-		} else {
-			return false;
-		}
+        return entries.getLength() == 1;
 	}
 
 	/**
@@ -693,11 +690,7 @@ public class SamlResponse {
 	 */
 	public Boolean checkOneAuthnStatement() throws XPathExpressionException {
 		NodeList entries = this.queryAssertion("/saml:AuthnStatement");
-		if (entries.getLength() == 1) {
-			return true;
-		} else {
-			return false;
-		}
+        return entries.getLength() == 1;
 	}
 
 	/**
@@ -1062,7 +1055,7 @@ public class SamlResponse {
 				// validate NotBefore
 				if (nbAttribute != null) {
 					Instant notBeforeDate = Util.parseDateTime(nbAttribute.getNodeValue());
-					notBeforeDate = ChronoUnit.SECONDS.addTo(notBeforeDate, Constants.ALOWED_CLOCK_DRIFT * -1);
+					notBeforeDate = ChronoUnit.SECONDS.addTo(notBeforeDate, Constants.ALOWED_CLOCK_DRIFT * -1L);
 					if (Util.isAfterNow(notBeforeDate)) {
 						throw new ValidationError("Could not validate timestamp: not yet valid. Check system clock.", ValidationError.ASSERTION_TOO_EARLY);
 					}

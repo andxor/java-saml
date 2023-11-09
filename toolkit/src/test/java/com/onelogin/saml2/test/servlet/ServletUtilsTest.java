@@ -3,8 +3,7 @@ package com.onelogin.saml2.test.servlet;
 import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -183,10 +182,10 @@ public class ServletUtilsTest {
     public void testIsHTTPS() {
         HttpServletRequest request_1 = mock(HttpServletRequest.class);
         when(request_1.isSecure()).thenReturn(false);
-        assertEquals(false, ServletUtils.isHTTPS(request_1));
+        assertFalse(ServletUtils.isHTTPS(request_1));
 
         when(request_1.isSecure()).thenReturn(true);
-        assertEquals(true, ServletUtils.isHTTPS(request_1));
+        assertTrue(ServletUtils.isHTTPS(request_1));
     }
 
     /**

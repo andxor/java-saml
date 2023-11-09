@@ -1091,11 +1091,8 @@ public class Saml2Settings {
 			return false;
 		}
 
-		if (value instanceof List && ((List<?>) value).isEmpty()) {
-			return false;
-		}
-		return true;
-	}
+        return !(value instanceof List) || !((List<?>) value).isEmpty();
+    }
 
 	/**
 	 * Set the spValidationOnly value, used to check IdP data on checkSettings method

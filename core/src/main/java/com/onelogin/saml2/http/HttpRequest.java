@@ -24,7 +24,7 @@ import com.onelogin.saml2.util.Util;
  */
 public final class HttpRequest {
 
-    public static final Map<String, List<String>> EMPTY_PARAMETERS = Collections.<String, List<String>>emptyMap();
+    public static final Map<String, List<String>> EMPTY_PARAMETERS = Collections.emptyMap();
 
     private final String requestURL;
     private final Map<String, List<String>> parameters;
@@ -137,7 +137,7 @@ public final class HttpRequest {
      */
     public List<String> getParameters(String name) {
         List<String> values = parameters.get(name);
-        return values != null ? values : Collections.<String>emptyList();
+        return values != null ? values : Collections.emptyList();
     }
 
     /**

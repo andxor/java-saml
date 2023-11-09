@@ -7,12 +7,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.Matchers.contains;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.matches;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -37,9 +32,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -122,7 +117,7 @@ public class AuthTest {
 	@Test
 	public void testConstructor() throws IOException, SettingsException, Error {
 		Auth auth = new Auth();
-		assertTrue(auth.getSettings() != null);
+        assertNotNull(auth.getSettings());
 
 		Saml2Settings settings = new SettingsBuilder().fromFile("onelogin.saml.properties").build();
 		assertEquals(settings.getIdpEntityId(), auth.getSettings().getIdpEntityId());
@@ -143,7 +138,7 @@ public class AuthTest {
 	@Test
 	public void testConstructorWithFilename() throws IOException, SettingsException, Error {
 		Auth auth = new Auth("config/config.min.properties");
-		assertTrue(auth.getSettings() != null);
+        assertNotNull(auth.getSettings());
 
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.min.properties").build();
 		assertEquals(settings.getIdpEntityId(), auth.getSettings().getIdpEntityId());
@@ -168,9 +163,9 @@ public class AuthTest {
 	public void testConstructorWithFilenameAndKeyStore() throws IOException, SettingsException, Error, NoSuchAlgorithmException, CertificateException, KeyStoreException, UnrecoverableKeyException {
         
 		Auth auth = new Auth("config/config.min.properties", getKeyStoreSettings());
-		assertTrue(auth.getSettings() != null);
-		assertTrue(auth.getSettings().getSPcert() != null);
-		assertTrue(auth.getSettings().getSPkey() != null);
+        assertNotNull(auth.getSettings());
+        assertNotNull(auth.getSettings().getSPcert());
+        assertNotNull(auth.getSettings().getSPkey());
 		
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.min.properties", getKeyStoreSettings()).build();
 		assertEquals(settings.getSPcert(), auth.getSettings().getSPcert());
@@ -196,7 +191,7 @@ public class AuthTest {
 		when(request.getParameterMap()).thenReturn(singletonMap("SAMLResponse", new String[]{samlResponseEncoded}));
 
 		Auth auth = new Auth(request, response);
-		assertTrue(auth.getSettings() != null);
+        assertNotNull(auth.getSettings());
 
 		Saml2Settings settings = new SettingsBuilder().fromFile("onelogin.saml.properties").build();
 		assertEquals(settings.getIdpEntityId(), auth.getSettings().getIdpEntityId());
@@ -223,9 +218,9 @@ public class AuthTest {
 		HttpServletResponse response = mock(HttpServletResponse.class);
 
 		Auth auth = new Auth(getKeyStoreSettings(), request, response);
-		assertTrue(auth.getSettings() != null);
-		assertTrue(auth.getSettings().getSPcert() != null);
-		assertTrue(auth.getSettings().getSPkey() != null);
+        assertNotNull(auth.getSettings());
+        assertNotNull(auth.getSettings().getSPcert());
+        assertNotNull(auth.getSettings().getSPkey());
 
 		Saml2Settings settings = new SettingsBuilder().fromFile("onelogin.saml.properties", getKeyStoreSettings()).build();
 		assertEquals(settings.getSPkey(), auth.getSettings().getSPkey());
@@ -251,7 +246,7 @@ public class AuthTest {
 		when(request.getParameterMap()).thenReturn(singletonMap("SAMLResponse", new String[]{samlResponseEncoded}));
 
 		Auth auth = new Auth("config/config.min.properties", request, response);
-		assertTrue(auth.getSettings() != null);
+        assertNotNull(auth.getSettings());
 
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.min.properties").build();
 		assertEquals(settings.getIdpEntityId(), auth.getSettings().getIdpEntityId());

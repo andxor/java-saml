@@ -2,6 +2,7 @@ package com.onelogin.saml2.test;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -18,7 +19,7 @@ public class NaiveUrlEncodeTest {
         String propperEncoded = Util.urlEncoder(theString);
 
         Assert.assertNotEquals("Encoded versions should differ", naiveEncoded, propperEncoded);
-        Assert.assertEquals("Decoded versions equal", URLDecoder.decode(naiveEncoded, "UTF-8"), URLDecoder.decode(propperEncoded, "UTF-8"));
+        Assert.assertEquals("Decoded versions equal", URLDecoder.decode(naiveEncoded, StandardCharsets.UTF_8), URLDecoder.decode(propperEncoded, StandardCharsets.UTF_8));
     }
 
 }

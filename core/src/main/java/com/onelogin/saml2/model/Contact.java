@@ -68,7 +68,7 @@ public class Contact {
 	@Deprecated
 	public Contact(String contactType, String givenName, String emailAddress) {
 		this(contactType, null, givenName != null ? givenName : "", null,
-		            Arrays.asList(emailAddress != null ? emailAddress : ""), null);
+                List.of(emailAddress != null ? emailAddress : ""), null);
 	}
 
 	/**

@@ -14,8 +14,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -59,17 +59,17 @@ public class Auth {
 	/**
 	 * Settings data.
 	 */
-	private Saml2Settings settings;
+	private final Saml2Settings settings;
 
 	/**
 	 * HttpServletRequest object to be processed (Contains GET and POST parameters, session, ...).
 	 */
-	private HttpServletRequest request;
+	private final HttpServletRequest request;
 
 	/**
 	 * HttpServletResponse object to be used (For example to execute the redirections).
 	 */
-	private HttpServletResponse response;
+	private final HttpServletResponse response;
 
 	/**
 	 * NameID.
@@ -134,7 +134,7 @@ public class Auth {
 	/**
 	 * Stores any error.
 	 */
-	private List<String> errors = new ArrayList<String>();
+	private final List<String> errors = new ArrayList<String>();
 
 	/**
 	 * Reason of the last error.

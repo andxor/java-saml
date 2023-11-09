@@ -1117,7 +1117,7 @@ public class AuthnResponseTest {
 		assertEquals(Arrays.asList("\n  \thttp://example.com/services/trust\n  ", "\n    \thttp://example.com/services/trust\n    "), samlResponse.getIssuers());
 		settings.setTrimNameIds(true);
 		samlResponse = new SamlResponse(settings, newHttpRequest(samlResponseEncoded));
-		assertEquals(Arrays.asList("http://example.com/services/trust"), samlResponse.getIssuers());
+		assertEquals(List.of("http://example.com/services/trust"), samlResponse.getIssuers());
 	}
 
 	/**
@@ -2878,15 +2878,15 @@ public class AuthnResponseTest {
 		String samlResponseEncoded = Util.getFileAsString("data/responses/signed_message_response.xml.base64");
 
 		SamlResponse samlResponse = new SamlResponse(settings, newHttpRequest(samlResponseEncoded));
-		assertTrue(!samlResponse.processSignedElements().isEmpty());
+        assertFalse(samlResponse.processSignedElements().isEmpty());
 
 		samlResponseEncoded = Util.getFileAsString("data/responses/signed_assertion_response.xml.base64");
 		samlResponse = new SamlResponse(settings, newHttpRequest(samlResponseEncoded));
-		assertTrue(!samlResponse.processSignedElements().isEmpty());
+        assertFalse(samlResponse.processSignedElements().isEmpty());
 
 		samlResponseEncoded = Util.getFileAsString("data/responses/double_signed_response.xml.base64");
 		samlResponse = new SamlResponse(settings, newHttpRequest(samlResponseEncoded));
-		assertTrue(!samlResponse.processSignedElements().isEmpty());
+        assertFalse(samlResponse.processSignedElements().isEmpty());
 
 		samlResponseEncoded = Util.getFileAsString("data/responses/unsigned_response.xml.base64");
 		samlResponse = new SamlResponse(settings, newHttpRequest(samlResponseEncoded));

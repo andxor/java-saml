@@ -53,7 +53,7 @@ public class SettingsBuilder {
 	/**
 	 * Private property that contains the SAML settings
 	 */
-	private Map<String, Object> samlData = new LinkedHashMap<>();
+	private final Map<String, Object> samlData = new LinkedHashMap<>();
 
 	/**
 	 * Saml2Settings object

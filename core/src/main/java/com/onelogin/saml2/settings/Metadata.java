@@ -244,7 +244,7 @@ public class Metadata {
 					}
 
 					if (isRequired != null) {
-						contentStr += " isRequired=\"" + isRequired.toString() + "\"";
+						contentStr += " isRequired=\"" + isRequired + "\"";
 					}
 
 					if (attrValues != null && !attrValues.isEmpty()) {

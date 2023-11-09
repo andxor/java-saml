@@ -6,9 +6,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 
 import com.onelogin.saml2.http.HttpRequest;
@@ -33,7 +33,7 @@ public class ServletUtils {
      */
     public static HttpRequest makeHttpRequest(HttpServletRequest req) {
     	@SuppressWarnings("unchecked")
-        final Map<String, String[]> paramsAsArray = (Map<String, String[]>) req.getParameterMap();
+        final Map<String, String[]> paramsAsArray = req.getParameterMap();
         final Map<String, List<String>> paramsAsList = new HashMap<>();
         for (Map.Entry<String, String[]> param : paramsAsArray.entrySet()) {
             paramsAsList.put(param.getKey(), Arrays.asList(param.getValue()));
@@ -152,7 +152,7 @@ public class ServletUtils {
      * @return string the target URL
      * @throws IOException
      *
-     * @see javax.servlet.http.HttpServletResponse#sendRedirect(String)
+     * @see jakarta.servlet.http.HttpServletResponse#sendRedirect(String)
      */
     public static String sendRedirect(HttpServletResponse response, String location, Map<String, String> parameters, Boolean stay) throws IOException {
         String target = location;
@@ -192,7 +192,7 @@ public class ServletUtils {
 	 *
      * @throws IOException
      *
-     * @see javax.servlet.http.HttpServletResponse#sendRedirect(String)
+     * @see jakarta.servlet.http.HttpServletResponse#sendRedirect(String)
      */
     public static void sendRedirect(HttpServletResponse response, String location, Map<String, String> parameters) throws IOException {
     	sendRedirect(response, location, parameters, false);
