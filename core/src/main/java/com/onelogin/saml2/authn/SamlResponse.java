@@ -595,7 +595,7 @@ public class SamlResponse {
 			for (int i = 0; i < nodes.getLength(); i++) {
 				NamedNodeMap attrName = nodes.item(i).getAttributes();
 				String attName = attrName.getNamedItem("Name").getNodeValue();
-				if (attributes.containsKey(attName) && !settings.isAllowRepeatAttributeName()) {
+				if (attributes.containsKey(attName) && !settings.	isAllowRepeatAttributeName()) {
 					throw new ValidationError("Found an Attribute element with duplicated Name", ValidationError.DUPLICATED_ATTRIBUTE_NAME_FOUND);
 				}
 

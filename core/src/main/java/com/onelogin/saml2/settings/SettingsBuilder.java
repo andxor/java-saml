@@ -1,9 +1,12 @@
 package com.onelogin.saml2.settings;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.Key;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -13,17 +16,8 @@ import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Objects;
-import java.util.Properties;
-import java.util.SortedMap;
-import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -74,14 +68,16 @@ public class SettingsBuilder {
 
 	public final static String SP_CONTACT_PROPERTY_KEY_PREFIX = "onelogin.saml2.sp.contact";
 	public final static String SP_CONTACT_CONTACT_TYPE_PROPERTY_KEY_SUFFIX = "contactType";
+	public final static String SP_CONTACT_CONTACT_SPID_ENTITY_TYPE_PROPERTY_KEY_SUFFIX = "spid_entity_type";
 	public final static String SP_CONTACT_COMPANY_PROPERTY_KEY_SUFFIX = "company";
 	public final static String SP_CONTACT_GIVEN_NAME_PROPERTY_KEY_SUFFIX = "given_name";
 	public final static String SP_CONTACT_SUR_NAME_PROPERTY_KEY_SUFFIX = "sur_name";
 	public final static String SP_CONTACT_EMAIL_ADDRESS_PROPERTY_KEY_PREFIX = "email_address";
 	public final static String SP_CONTACT_TELEPHONE_NUMBER_PROPERTY_KEY_PREFIX = "telephone_number";
 	public final static String SP_CONTACT_VAT_NUMBER_PROPERTY_KEY_PREFIX = "vat_number";
-
 	public final static String SP_CONTACT_FISCAL_CODE_PROPERTY_KEY_PREFIX = "fiscal_code";
+	public final static String SP_CONTACT_TAGS_PROPERTY_KEY_SUFFIX= "tags";
+
 	public final static String SP_CONTACT_CESSIONARIO_COMMITTENTE_REGISTRY_ID_COUNTRY_PROPERTY_KEY_PREFIX = "cessionario_committente.registry.id_country";
 	public final static String SP_CONTACT_CESSIONARIO_COMMITTENTE_REGISTRY_ID_CODE_PROPERTY_KEY_PREFIX = "cessionario_committente.registry.id_code";
 	public final static String SP_CONTACT_CESSIONARIO_COMMITTENTE_REGISTRY_DENOMINATION_PROPERTY_KEY_PREFIX = "cessionario_committente.registry.denomination";
@@ -194,29 +190,41 @@ public class SettingsBuilder {
 	 */
 	public SettingsBuilder fromFile(String propFileName, KeyStoreSettings keyStoreSetting) throws Error, IOException {
 
-		ClassLoader classLoader = getClass().getClassLoader();
-		try (InputStream inputStream = classLoader.getResourceAsStream(propFileName)) {
-			if (inputStream != null) {
-				Properties prop = new Properties();
-				prop.load(inputStream);
-				parseProperties(prop);
-				LOGGER.debug("properties file '{}' loaded succesfully", propFileName);
-			} else {
-				String errorMsg = "properties file '" + propFileName + "' not found in the classpath";
-				LOGGER.error(errorMsg);
+		if (propFileName.startsWith("/")) {
+			try (InputStream inputStream = Files.newInputStream(Paths.get(propFileName))) {
+				 loadProperties(inputStream);
+			} catch (IOException e) {
+				String errorMsg = "properties file'" + propFileName + "' not found";
+				LOGGER.error(errorMsg, e);
 				throw new Error(errorMsg, Error.SETTINGS_FILE_NOT_FOUND);
 			}
-		} catch (IOException e) {
-			String errorMsg = "properties file'" + propFileName + "' cannot be loaded.";
-			LOGGER.error(errorMsg, e);
-			throw new Error(errorMsg, Error.SETTINGS_FILE_NOT_FOUND);
+		} else {
+			try (InputStream inputStream =  getClass().getClassLoader().getResourceAsStream(propFileName)) {
+				loadProperties(inputStream);
+			} catch (IOException e) {
+				String errorMsg = "properties file'" + propFileName + "' not found in classpath";
+				LOGGER.error(errorMsg, e);
+				throw new Error(errorMsg, Error.SETTINGS_FILE_NOT_FOUND);
+			}
 		}
+
 		// Parse KeyStore and set the properties for SP Cert and Key
 		if (keyStoreSetting != null) {
 			parseKeyStore(keyStoreSetting);
 		}
 
 		return this;
+	}
+
+
+	private void loadProperties(InputStream inputStream) throws IOException, Error {
+		if (inputStream != null) {
+			Properties prop = new Properties();
+			prop.load(inputStream);
+			parseProperties(prop);
+		} else {
+			throw new Error("properties file not found", Error.SETTINGS_FILE_NOT_FOUND);
+		}
 	}
 
 	/**
@@ -641,6 +649,7 @@ public class SettingsBuilder {
 		final List<String> numbers = toStringList(phoneNumbers);
 	    final String vatNumber = loadStringProperty(SP_CONTACT_VAT_NUMBER_PROPERTY_KEY_PREFIX, contactProps);
 	    final String fiscalCode = loadStringProperty(SP_CONTACT_FISCAL_CODE_PROPERTY_KEY_PREFIX, contactProps);
+		final String spidEntityType = loadStringProperty(SP_CONTACT_CONTACT_SPID_ENTITY_TYPE_PROPERTY_KEY_SUFFIX, contactProps);
 		CessionarioCommittente cessionarioCommittente = null;
 		if ("billing".equals(contactType)) {
 			final String cmIDCountry = loadStringProperty(SP_CONTACT_CESSIONARIO_COMMITTENTE_REGISTRY_ID_COUNTRY_PROPERTY_KEY_PREFIX, contactProps);
@@ -654,7 +663,14 @@ public class SettingsBuilder {
 			final String hqCounty = loadStringProperty(SP_CONTACT_CESSIONARIO_COMMITTENTE_HQ_COUNTY_PROPERTY_KEY_PREFIX, contactProps);
 			cessionarioCommittente = new CessionarioCommittente(cmIDCountry, cmIDCode, cmIDDenomination, hqAddress, hqAddressNumber, hqPostalCode, hqCity, hqCounty);
 		}
-		return new Contact(contactType, company, givenName, surName, emails, numbers, vatNumber, fiscalCode, cessionarioCommittente);
+		List<String> tags = safeSplitToList(loadStringProperty(SP_CONTACT_TAGS_PROPERTY_KEY_SUFFIX, contactProps), ",");
+		return new Contact(contactType, company, givenName, surName, emails, numbers, fiscalCode, vatNumber, cessionarioCommittente, spidEntityType, tags);
+	}
+
+	private List<String> safeSplitToList(String toSplit, String splitter) {
+		if (StringUtils.isBlank(toSplit)) return Collections.emptyList();
+		if (StringUtils.isEmpty(splitter)) return Collections.emptyList();
+		return Arrays.asList(toSplit.split(splitter));
 	}
 
 	/**
@@ -910,7 +926,6 @@ public class SettingsBuilder {
 		}
 		return null;
 	}
-
 	private Boolean loadBooleanProperty(String propertyKey) {
 		Object propValue = samlData.get(propertyKey);
 		return loadBooleanProperty(propertyKey, samlData);

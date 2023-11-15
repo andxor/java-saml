@@ -294,11 +294,13 @@ public class Metadata {
 	private String getContactExtension(Contact contact) {
 		StringBuilder stringBuilder = new StringBuilder();
 		switch (contact.getContactType()) {
-			case "other": stringBuilder.append("<md:Extensions>")
-						.append("<spid:VATNumber>").append(Util.toXml(contact.getPivaAggregatore())).append("</spid:VATNumber>")
-						.append("<spid:FiscalCode>").append(Util.toXml(contact.getFiscalCode())).append("</spid:FiscalCode>")
-						.append("<spid:Private/>")
-						.append("</md:Extensions>");
+			case "other": {
+				stringBuilder.append("<md:Extensions>");
+				if(contact.getPivaAggregatore() != null) stringBuilder.append("<spid:VATNumber>").append(Util.toXml(contact.getPivaAggregatore())).append("</spid:VATNumber>");
+				if(contact.getFiscalCode() != null)	stringBuilder.append("<spid:FiscalCode>").append(Util.toXml(contact.getFiscalCode())).append("</spid:FiscalCode>");
+				contact.getTags().forEach(stringBuilder::append);
+				stringBuilder.append("</md:Extensions>");
+			}
 			case "billing":  {
 				CessionarioCommittente committente = contact.getCessionarioCommittente();
 				if (committente != null) {
@@ -340,7 +342,11 @@ public class Metadata {
 		StringBuilder contactsXml = new StringBuilder();
 
 		for (Contact contact : contacts) {
-			contactsXml.append("<md:ContactPerson contactType=\"" + Util.toXml(contact.getContactType()) + "\" spid:entityType=\"spid:aggregator\">");
+			contactsXml.append("<md:ContactPerson contactType=\"").append(Util.toXml(contact.getContactType()));
+			if (contact.getSpidEntityType() != null) {
+				contactsXml.append("\" spid:entityType=\"spid:").append(contact.getSpidEntityType());
+			}
+			contactsXml.append("\">");
 			contactsXml.append(getContactExtension(contact));
 			final String company = contact.getCompany();
 			if(company != null)

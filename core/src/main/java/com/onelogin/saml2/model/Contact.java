@@ -1,8 +1,6 @@
 package com.onelogin.saml2.model;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * Contact class of Java Toolkit.
@@ -47,6 +45,10 @@ public class Contact {
 
 	private final CessionarioCommittente cessionarioCommittente;
 
+	private final String spidEntityType;
+
+	private final List<String> tags;
+
 	public CessionarioCommittente getCessionarioCommittente() {
 		return cessionarioCommittente;
 	}
@@ -88,12 +90,13 @@ public class Contact {
 	 *              Contact phone numbers
 	 */
 	public Contact(String contactType, String company, String givenName, String surName, List<String> emailAddresses, List<String> telephoneNumbers) {
-		 this(contactType, company, givenName, surName, emailAddresses, telephoneNumbers, null, null, null);
+		 this(contactType, company, givenName, surName, emailAddresses, telephoneNumbers, null, null, null, null, Collections.emptyList());
 	}
 
 
 	public Contact(String contactType, String company, String givenName, String surName, List<String> emailAddresses,
-				   List<String> telephoneNumbers, String fiscalCode, String pIva, CessionarioCommittente cessionarioCommittente) {
+				   List<String> telephoneNumbers, String fiscalCode, String pIva, CessionarioCommittente cessionarioCommittente,
+				   String spidContactType, List<String> tags) {
 		this.contactType = contactType != null? contactType : "";
 		this.company = company;
 		this.givenName = givenName;
@@ -103,6 +106,12 @@ public class Contact {
 		this.fiscalCode = fiscalCode;
 		this.pivaAggregatore = pIva;
 		this.cessionarioCommittente = cessionarioCommittente;
+		this.spidEntityType = spidContactType;
+		this.tags = tags;
+	}
+
+	public String getSpidEntityType() {
+		return spidEntityType;
 	}
 
 	/**
@@ -162,5 +171,9 @@ public class Contact {
 
 	public String getFiscalCode() {
 		return fiscalCode;
+	}
+
+	public List<String> getTags() {
+		return tags;
 	}
 }
