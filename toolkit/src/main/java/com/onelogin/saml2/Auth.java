@@ -1222,7 +1222,11 @@ public class Auth {
 				errorReason = samlResponse.getError();
 				validationException = samlResponse.getValidationException();
 				SamlResponseStatus samlResponseStatus = samlResponse.getResponseStatus();
-				if (samlResponseStatus.getStatusCode() == null || !samlResponseStatus.getStatusCode().equals(Constants.STATUS_SUCCESS)) {
+				if (samlResponseStatus == null) {
+					errors.add("invalid_response");
+					LOGGER.error("processResponse error. invalid_response. Missing response status");
+					LOGGER.debug(" --> " + samlResponseParameter);
+				} else if (samlResponseStatus.getStatusCode() == null || !samlResponseStatus.getStatusCode().equals(Constants.STATUS_SUCCESS)) {
 					errors.add("response_not_success");
 					LOGGER.error("processResponse error. sso_not_success");
 					LOGGER.debug(" --> " + samlResponseParameter);
