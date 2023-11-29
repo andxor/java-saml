@@ -21,7 +21,7 @@ public interface AttributeConsumingServiceSelector {
      * @return a selector of the default Attribute Consuming Service
      */
     static AttributeConsumingServiceSelector useDefault() {
-        return () -> null;
+        return () -> AttributeConsumingServiceSelector.byIndex(0).getAttributeConsumingServiceIndex();
     }
 
     /**
@@ -60,9 +60,9 @@ public interface AttributeConsumingServiceSelector {
             final List<AttributeConsumingService> services = settings.getSpAttributeConsumingServices();
             if (services != null)
                 return services.stream().filter(service -> service.getServiceName().equals(serviceName))
-                        .findFirst().map(AttributeConsumingService::getIndex).orElse(null);
+                        .findFirst().map(AttributeConsumingService::getIndex).orElse(AttributeConsumingServiceSelector.useDefault().getAttributeConsumingServiceIndex());
             else
-                return null;
+                return useDefault().getAttributeConsumingServiceIndex();
         };
     }
 
