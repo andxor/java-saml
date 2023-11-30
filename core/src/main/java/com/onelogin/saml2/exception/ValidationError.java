@@ -55,6 +55,11 @@ public class ValidationError extends SAMLException {
 	public static final int MISSING_ENCRYPTED_ELEMENT = 48;
 	public static final int INVALID_ISSUE_INSTANT_FORMAT = 49;
 
+	//SPID SPECIFIC
+	public static final int INVALID_ISSUE_INSTANT = 50;
+	public static final int MISSING_ISSUER_FORMAT_ATTRIBUTE = 51;
+	public static final int WRONG_ISSUER_FORMAT_ATTRIBUTE = 52;
+
 	private final int errorCode;
 
 	public ValidationError(String message, int errorCode) {

@@ -734,6 +734,13 @@ public class SamlResponse {
 		NodeList responseIssuer = Util.query(samlResponseDocument, "/samlp:Response/saml:Issuer");
 		if (responseIssuer.getLength() > 0) {
 			if (responseIssuer.getLength() == 1) {
+				Node formatAttribute = responseIssuer.item(0).getAttributes().getNamedItem("Format");
+				if (formatAttribute == null) {
+					throw new ValidationError("Issuer does not have Format attribute", ValidationError.MISSING_ISSUER_FORMAT_ATTRIBUTE);
+				}
+				if (!"urn:oasis:names:tc:SAML:2.0:nameid-format:entity".equals(formatAttribute.getNodeValue())) {
+					throw new ValidationError("Issuer format should be 'urn:oasis:names:tc:SAML:2.0:nameid-format:entity'. It is: " + formatAttribute.getNodeValue(), ValidationError.WRONG_ISSUER_FORMAT_ATTRIBUTE);
+				}
 				String value = responseIssuer.item(0).getTextContent();
 				if(value != null && settings.isTrimNameIds()) {
 					value = value.trim();
@@ -1283,6 +1290,8 @@ public class SamlResponse {
 					throw new ValidationError("The response was received at " + currentUrl + " instead of " + destinationUrl, ValidationError.WRONG_DESTINATION);
 				}
 			}
+		} else {
+			throw new ValidationError("The response is missing Destination value", ValidationError.EMPTY_DESTINATION);
 		}
 	}
 
