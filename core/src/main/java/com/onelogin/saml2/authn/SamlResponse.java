@@ -94,6 +94,8 @@ public class SamlResponse {
 	 */
 	private SamlResponseStatus responseStatus;
 
+	private String inResponseTo;
+
 	public static final String FORMAT_ISSUER = "urn:oasis:names:tc:SAML:2.0:nameid-format:entity";
 
 	/**
@@ -238,7 +240,7 @@ public class SamlResponse {
 					throw new ValidationError("Missing InResponseTo attribute", ValidationError.WRONG_INRESPONSETO);
 				}
 				String responseInResponseTo = getResponseInResponseTo(requestId, rootElement);
-
+				this.inResponseTo = responseInResponseTo;
 				// Check SAML version on the assertion
 				NodeList assertions = queryAssertion("");
 				Node versionAttribute = assertions.item(0).getAttributes().getNamedItem("Version");
@@ -1410,4 +1412,9 @@ public class SamlResponse {
 		}
 		return result;
 	}
+
+	public String getInResponseTo() {
+		return inResponseTo;
+	}
+
 }

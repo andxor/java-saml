@@ -14,6 +14,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.onelogin.saml2.exception.ValidationError;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -168,6 +169,7 @@ public class Auth {
 	 * encrypted, by default tries to return the decrypted XML
 	 */
 	private String lastResponse;
+	private SamlResponse samlResponse;
 
 	private static final SamlMessageFactory DEFAULT_SAML_MESSAGE_FACTORY = new SamlMessageFactory() {};
 
@@ -1188,6 +1190,10 @@ public class Auth {
 		return settings.getIdpSingleLogoutServiceResponseUrl().toString();
 	}
 
+	public SamlResponse getSamlResponse() {
+		return samlResponse;
+	}
+
 	/**
 	 * Process the SAML Response sent by the IdP.
 	 *
@@ -1202,6 +1208,7 @@ public class Auth {
 
 		if (samlResponseParameter != null) {
 			SamlResponse samlResponse = samlMessageFactory.createSamlResponse(settings, httpRequest);
+			this.samlResponse = samlResponse;
 			lastResponse = samlResponse.getSAMLResponseXml();
 
 			if (samlResponse.isValid(requestId)) {
@@ -1215,6 +1222,10 @@ public class Auth {
 				sessionExpiration = samlResponse.getSessionNotOnOrAfter();
 				lastMessageId = samlResponse.getId();
 				lastMessageIssueInstant = samlResponse.getResponseIssueInstant();
+				Instant maxWaitTimrForRequest = Instant.now().minusSeconds( 180 );
+				if (lastMessageIssueInstant.toInstant().isBefore(maxWaitTimrForRequest)) {
+					throw new ValidationError("IssueInstant before request", ValidationError.INVALID_ISSUE_INSTANT);
+				}
 				lastAssertionId = samlResponse.getAssertionId();
 				lastAssertionNotOnOrAfter = samlResponse.getAssertionNotOnOrAfter();
 				LOGGER.debug("processResponse success --> " + samlResponseParameter);
