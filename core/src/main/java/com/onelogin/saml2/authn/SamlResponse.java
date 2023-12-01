@@ -16,6 +16,7 @@ import java.util.Objects;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 
+import com.nimbusds.oauth2.sdk.util.ListUtils;
 import com.onelogin.saml2.model.hsm.HSM;
 
 import org.apache.commons.lang3.StringUtils;
@@ -92,6 +93,8 @@ public class SamlResponse {
 	 * The respone status code and messages
 	 */
 	private SamlResponseStatus responseStatus;
+
+	public static final String FORMAT_ISSUER = "urn:oasis:names:tc:SAML:2.0:nameid-format:entity";
 
 	/**
 	 * Constructor to have a Response object fully built and ready to validate the saml response.
@@ -230,17 +233,11 @@ public class SamlResponse {
 					}
 				}
 
-				String responseInResponseTo = rootElement.hasAttribute("InResponseTo") ? rootElement.getAttribute("InResponseTo") : null;
-				if (requestId == null && responseInResponseTo != null && settings.isRejectUnsolicitedResponsesWithInResponseTo()) {
-					throw new ValidationError("The Response has an InResponseTo attribute: " + responseInResponseTo +
-							" while no InResponseTo was expected", ValidationError.WRONG_INRESPONSETO);
-				}
 
-				// Check if the InResponseTo of the Response matches the ID of the AuthNRequest (requestId) if provided
-				if (requestId != null && !Objects.equals(responseInResponseTo, requestId)) {
-						throw new ValidationError("The InResponseTo of the Response: " + responseInResponseTo
-								+ ", does not match the ID of the AuthNRequest sent by the SP: " + requestId, ValidationError.WRONG_INRESPONSETO);
+				if (!rootElement.hasAttribute("InResponseTo")) {
+					throw new ValidationError("Missing InResponseTo attribute", ValidationError.WRONG_INRESPONSETO);
 				}
+				String responseInResponseTo = getResponseInResponseTo(requestId, rootElement);
 
 				// Check SAML version on the assertion
 				NodeList assertions = queryAssertion("");
@@ -274,6 +271,26 @@ public class SamlResponse {
 				if (!this.checkOneAuthnStatement()) {
 					throw new ValidationError("The Assertion must include an AuthnStatement element", ValidationError.WRONG_NUMBER_OF_AUTHSTATEMENTS);
 				}
+				// validate AuthnContext
+				NodeList authContext = this.queryAssertion("/saml:AuthnStatement/saml:AuthnContext");
+				if (authContext.getLength() == 0) {
+					throw new ValidationError("Missing AuthnContext", ValidationError.MISSING_AUTH_CONTEXT);
+				}
+				Node authnContextNode = authContext.item(0);
+				NodeList authnContextClassRefList = authnContextNode.getChildNodes();
+				if (authnContextClassRefList.getLength() == 0) {
+					throw new ValidationError("Missing AuthnContextClassRef", ValidationError.MISSING_AUTH_CONTEXT_CLASS_REF);
+				}
+
+				String authContextClassRefValue = authContext.item(0).getTextContent().trim();
+				if (!List.of(
+						"https://www.spid.gov.it/SpidL1",
+						"https://www.spid.gov.it/SpidL2",
+						"https://www.spid.gov.it/SpidL3")
+						.contains(authContextClassRefValue)) {
+					throw new ValidationError("Wrong AuthnContextClassRef value", ValidationError.WRONG_AUTH_CONTEXT_CLASS_REF);
+				}
+
 
 				// EncryptedAttributes are not supported
 				NodeList encryptedAttributeNodes = this.queryAssertion("/saml:AttributeStatement/saml:EncryptedAttribute");
@@ -355,6 +372,22 @@ public class SamlResponse {
 			LOGGER.error(validationException.getMessage());
 			return false;
 		}
+	}
+
+	private String getResponseInResponseTo(String requestId, Element rootElement) throws ValidationError {
+		String responseInResponseTo = rootElement.getAttribute("InResponseTo");
+
+		if (requestId == null && settings.isRejectUnsolicitedResponsesWithInResponseTo()) {
+			throw new ValidationError("The Response has an InResponseTo attribute: " + responseInResponseTo +
+					" while no InResponseTo was expected", ValidationError.WRONG_INRESPONSETO);
+		}
+
+		// Check if the InResponseTo of the Response matches the ID of the AuthNRequest (requestId) if provided
+		if (requestId != null && !Objects.equals(responseInResponseTo, requestId)) {
+				throw new ValidationError("The InResponseTo of the Response: " + responseInResponseTo
+						+ ", does not match the ID of the AuthNRequest sent by the SP: " + requestId, ValidationError.WRONG_INRESPONSETO);
+		}
+		return responseInResponseTo;
 	}
 
 	/**
@@ -497,8 +530,16 @@ public class SamlResponse {
 					nameIdData.put("SPNameQualifier", spNameQualifier);
 				}
 				if (nameIdElem.hasAttribute("NameQualifier")) {
-					nameIdData.put("NameQualifier", nameIdElem.getAttribute("NameQualifier"));
+					String nameQualifier = nameIdElem.getAttribute("NameQualifier");
+					if (StringUtils.isEmpty(nameQualifier)) {
+						throw new ValidationError("NameQualifier is empty", ValidationError.SP_NAME_QUALIFIER_NAME_MISMATCH);
+					}
+					nameIdData.put("NameQualifier", nameQualifier);
+				} else {
+					throw new ValidationError("Missing NameQualifier attributes", ValidationError.SP_NAME_QUALIFIER_NAME_MISMATCH);
 				}
+			} else {
+				throw new ValidationError("NameId with no element", ValidationError.NO_NAMEID);
 			}
 		} else {
 			if (settings.getWantNameId()) {
@@ -594,22 +635,24 @@ public class SamlResponse {
 		if (nodes.getLength() != 0) {
 			for (int i = 0; i < nodes.getLength(); i++) {
 				NamedNodeMap attrName = nodes.item(i).getAttributes();
-				String attName = attrName.getNamedItem("Name").getNodeValue();
+				String 	attName = attrName.getNamedItem("Name").getNodeValue();
 				if (attributes.containsKey(attName) && !settings.	isAllowRepeatAttributeName()) {
 					throw new ValidationError("Found an Attribute element with duplicated Name", ValidationError.DUPLICATED_ATTRIBUTE_NAME_FOUND);
 				}
 
-				NodeList childrens = nodes.item(i).getChildNodes();
-
+				NodeList children = nodes.item(i).getChildNodes();
+				if (children.getLength() == 0) {
+					throw new ValidationError("No children of Attribute found", ValidationError.MISSING_ATTRIBUTE_VALUE_ELEMENT);
+				}
 				List<String> attrValues = null;
 				if (attributes.containsKey(attName) && settings.isAllowRepeatAttributeName()) {
 					attrValues = attributes.get(attName);
 				} else {
 					attrValues = new ArrayList<String>();
 				}
-				for (int j = 0; j < childrens.getLength(); j++) {
-					if ("AttributeValue".equals(childrens.item(j).getLocalName())) {
-						String attrValue = childrens.item(j).getTextContent();
+				for (int j = 0; j < children.getLength(); j++) {
+					if ("AttributeValue".equals(children.item(j).getLocalName())) {
+						String attrValue = children.item(j).getTextContent();
 						if(attrValue != null && settings.isTrimAttributeValues()) {
 							attrValue = attrValue.trim();
 						}
@@ -700,11 +743,12 @@ public class SamlResponse {
 	 *
 	 * @throws XPathExpressionException
 	 */
-	public List<String> getAudiences() throws XPathExpressionException {
+	public List<String> getAudiences() throws XPathExpressionException, ValidationError {
 		List<String> audiences = new ArrayList<String>();
-
 		NodeList entries = this.queryAssertion("/saml:Conditions/saml:AudienceRestriction/saml:Audience");
-
+		if (entries == null || entries.getLength() == 0) {
+			throw new ValidationError("Missing Audience element", ValidationError.WRONG_AUDIENCE);
+		}
 		for (int i = 0; i < entries.getLength(); i++) {
 			if (entries.item(i) != null) {
 				String value = entries.item(i).getTextContent();
@@ -738,7 +782,7 @@ public class SamlResponse {
 				if (formatAttribute == null) {
 					throw new ValidationError("Issuer does not have Format attribute", ValidationError.MISSING_ISSUER_FORMAT_ATTRIBUTE);
 				}
-				if (!"urn:oasis:names:tc:SAML:2.0:nameid-format:entity".equals(formatAttribute.getNodeValue())) {
+				if (!FORMAT_ISSUER.equals(formatAttribute.getTextContent())) {
 					throw new ValidationError("Issuer format should be 'urn:oasis:names:tc:SAML:2.0:nameid-format:entity'. It is: " + formatAttribute.getNodeValue(), ValidationError.WRONG_ISSUER_FORMAT_ATTRIBUTE);
 				}
 				String value = responseIssuer.item(0).getTextContent();
@@ -768,8 +812,15 @@ public class SamlResponse {
 	public String getAssertionIssuer() throws XPathExpressionException, ValidationError {
 		NodeList assertionIssuer = this.queryAssertion("/saml:Issuer");
 		if (assertionIssuer.getLength() == 1) {
+			Node formatAttribute = assertionIssuer.item(0).getAttributes().getNamedItem("Format");
+			if (formatAttribute == null) {
+				throw new ValidationError("Issuer does not have Format attribute", ValidationError.MISSING_ISSUER_FORMAT_ATTRIBUTE);
+			}
+			if (!FORMAT_ISSUER.equals(formatAttribute.getTextContent())) {
+				throw new ValidationError("Issuer format should be 'urn:oasis:names:tc:SAML:2.0:nameid-format:entity'. It is: " + formatAttribute.getNodeValue(), ValidationError.WRONG_ISSUER_FORMAT_ATTRIBUTE);
+			}
 			String value = assertionIssuer.item(0).getTextContent();
-			if(value != null && settings.isTrimNameIds()) {
+			if(settings.isTrimNameIds()) {
 				value = value.trim();
 			}
 			return value;
@@ -1058,6 +1109,8 @@ public class SamlResponse {
 					if (Util.isEqualNow(notOnOrAfterDate) || Util.isBeforeNow(notOnOrAfterDate)) {
 						throw new ValidationError("Could not validate timestamp: expired. Check system clock.", ValidationError.ASSERTION_EXPIRED);
 					}
+				} else {
+					throw new ValidationError("Missing NotOnOrAfter in Conditions", ValidationError.MISSING_NOT_ON_OR_AFTER_CONDITIONS);
 				}
 				// validate NotBefore
 				if (nbAttribute != null) {
@@ -1066,6 +1119,8 @@ public class SamlResponse {
 					if (Util.isAfterNow(notBeforeDate)) {
 						throw new ValidationError("Could not validate timestamp: not yet valid. Check system clock.", ValidationError.ASSERTION_TOO_EARLY);
 					}
+				} else {
+					throw new ValidationError("Missing NotBefore in Conditions", ValidationError.MISSING_NOT_BEFORE_CONDITIONS);
 				}
 			}
 		}
@@ -1268,6 +1323,10 @@ public class SamlResponse {
 	 * @throws ValidationError
 	 */
 	protected void validateAudiences() throws XPathExpressionException, ValidationError {
+		NodeList audienceRestriction = this.queryAssertion("/saml:Conditions/saml:AudienceRestriction");
+		if (audienceRestriction == null || audienceRestriction.getLength() == 0) {
+			throw new ValidationError("No AudienceRestriction found", ValidationError.WRONG_AUDIENCE);
+		}
 		final List<String> validAudiences = getAudiences();
 		if (!validAudiences.isEmpty() && !validAudiences.contains(settings.getSpEntityId())) {
 			throw new ValidationError(settings.getSpEntityId() + " is not a valid audience for this Response", ValidationError.WRONG_AUDIENCE);

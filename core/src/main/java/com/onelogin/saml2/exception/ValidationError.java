@@ -60,6 +60,14 @@ public class ValidationError extends SAMLException {
 	public static final int MISSING_ISSUER_FORMAT_ATTRIBUTE = 51;
 	public static final int WRONG_ISSUER_FORMAT_ATTRIBUTE = 52;
 
+	public static final int MISSING_ATTRIBUTE_VALUE_ELEMENT = 53;
+	public static final int MISSING_AUTH_CONTEXT = 54;
+	public static final int MISSING_AUTH_CONTEXT_CLASS_REF = 55;
+	public static final int WRONG_AUTH_CONTEXT_CLASS_REF = 56;
+
+	public static final int MISSING_NOT_ON_OR_AFTER_CONDITIONS = 57;
+	public static final int MISSING_NOT_BEFORE_CONDITIONS = 58;
+
 	private final int errorCode;
 
 	public ValidationError(String message, int errorCode) {
