@@ -1216,18 +1216,14 @@ public class Auth {
 				nameidFormat = samlResponse.getNameIdFormat();
 				nameidNameQualifier = samlResponse.getNameIdNameQualifier();
 				nameidSPNameQualifier = samlResponse.getNameIdSPNameQualifier();
-				authenticated = true;
 				attributes = samlResponse.getAttributes();
 				sessionIndex = samlResponse.getSessionIndex();
 				sessionExpiration = samlResponse.getSessionNotOnOrAfter();
 				lastMessageId = samlResponse.getId();
 				lastMessageIssueInstant = samlResponse.getResponseIssueInstant();
-				Instant maxWaitTimrForRequest = Instant.now().minusSeconds( 180 );
-				if (lastMessageIssueInstant.toInstant().isBefore(maxWaitTimrForRequest)) {
-					throw new ValidationError("IssueInstant before request", ValidationError.INVALID_ISSUE_INSTANT);
-				}
 				lastAssertionId = samlResponse.getAssertionId();
 				lastAssertionNotOnOrAfter = samlResponse.getAssertionNotOnOrAfter();
+				authenticated = true;
 				LOGGER.debug("processResponse success --> " + samlResponseParameter);
 			} else {
 				errorReason = samlResponse.getError();

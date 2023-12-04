@@ -16,6 +16,7 @@ import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.time.Duration;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
@@ -138,6 +139,8 @@ public class SettingsBuilder {
 	public final static String SECURITY_REJECT_UNSOLICITED_RESPONSES_WITH_INRESPONSETO = "onelogin.saml2.security.reject_unsolicited_responses_with_inresponseto";
 	public final static String SECURITY_ALLOW_REPEAT_ATTRIBUTE_NAME_PROPERTY_KEY = "onelogin.saml2.security.allow_duplicated_attribute_name";
 	public final static String SECURITY_REJECT_DEPRECATED_ALGORITHM = "onelogin.saml2.security.reject_deprecated_alg";
+	public final static String SECURITY_REJECT_RESPONSE_AFTER_REQUEST_TIME = "onelogin.saml2.security.reject_response_after_request_time";
+
 
 	// Compress
 	public final static String COMPRESS_REQUEST = "onelogin.saml2.compress.request";
@@ -539,6 +542,10 @@ public class SettingsBuilder {
 		if (rejectDeprecatedAlg != null) {
 			saml2Setting.setRejectDeprecatedAlg(rejectDeprecatedAlg);
 		}
+		saml2Setting.setRejectResponseAfterRequestSeconds(StringUtils.defaultIfBlank(
+				loadStringProperty(SECURITY_REJECT_RESPONSE_AFTER_REQUEST_TIME), "300")
+		);
+
 	}
 
 	/**

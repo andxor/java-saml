@@ -365,7 +365,6 @@ public class SamlResponse {
 					throw new ValidationError("Signature validation failed. SAML Response rejected", ValidationError.INVALID_SIGNATURE);
 				}
 			}
-
 			LOGGER.debug("SAMLResponse validated --> {}", samlResponseString);
 			return true;
 		} catch (Exception e) {
@@ -375,6 +374,34 @@ public class SamlResponse {
 			return false;
 		}
 	}
+
+
+	public Instant getAssertionIssueInstant() throws XPathExpressionException {
+		NodeList assertionNode = this.queryAssertion("");
+		if ( assertionNode != null && assertionNode.item(0) != null) {
+			Element element = (Element) assertionNode.item(0);
+			if (element.hasAttribute("IssueInstant")) {
+				return Util.parseDateTime(element.getAttribute("IssueInstant"));
+			}
+
+		}
+		return null;
+	}
+
+	public boolean isValidResponseTimeFrame(AuthnRequest request) throws XPathExpressionException {
+		Instant requestIssueInstant = request.getIssueInstant().toInstant();
+		Instant assertionIssueInstant = this.getAssertionIssueInstant();
+		if (assertionIssueInstant == null) {
+			LOGGER.info("ResponseIssueInstant not found for time validation!");
+			return false;
+		}
+		if (assertionIssueInstant.isBefore(requestIssueInstant)) {
+			return false;
+		}
+
+		long secondsToAdd = Long.parseLong(settings.getRejectResponseAfterRequestSeconds());
+        return !assertionIssueInstant.isAfter(requestIssueInstant.plusSeconds(secondsToAdd));
+    }
 
 	private String getResponseInResponseTo(String requestId, Element rootElement) throws ValidationError {
 		String responseInResponseTo = rootElement.getAttribute("InResponseTo");
@@ -754,10 +781,11 @@ public class SamlResponse {
 		for (int i = 0; i < entries.getLength(); i++) {
 			if (entries.item(i) != null) {
 				String value = entries.item(i).getTextContent();
-				if(value != null) {
-					value = value.trim();
+				if (StringUtils.isBlank(value)) {
+					throw new ValidationError("Audience element not specified", ValidationError.WRONG_AUDIENCE);
 				}
-				if(!StringUtils.isEmpty(value)) {
+                value = value.trim();
+                if(!StringUtils.isEmpty(value)) {
 					audiences.add(value);
 				}
 			}

@@ -100,6 +100,8 @@ public class Saml2Settings {
 
 	private boolean spValidationOnly = false;
 
+	private String rejectResponseAfterRequestSeconds;
+
 
 
 	/**
@@ -950,6 +952,14 @@ public class Saml2Settings {
 		this.spAttributeConsumingServices = spAttributeConsumingServices;
 	}
 
+
+	public String getRejectResponseAfterRequestSeconds() {
+		return rejectResponseAfterRequestSeconds;
+	}
+
+	public void setRejectResponseAfterRequestSeconds(String rejectResponseAfterRequestSeconds) {
+		this.rejectResponseAfterRequestSeconds = rejectResponseAfterRequestSeconds;
+	}
 
 	/*
 	 * Auxiliary method to check Attribute Consuming Services are properly
