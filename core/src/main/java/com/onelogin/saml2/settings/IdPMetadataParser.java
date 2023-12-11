@@ -21,6 +21,7 @@ import org.xml.sax.InputSource;
 import com.onelogin.saml2.exception.Error;
 import com.onelogin.saml2.util.Constants;
 import com.onelogin.saml2.util.Util;
+import reactor.netty.internal.util.MapUtils;
 
 /**
  * IdPMetadataParser class of Java Toolkit.
@@ -312,7 +313,7 @@ public class IdPMetadataParser {
 	 * @return the Saml2Settings object with metadata info settings loaded
 	 */
 	public static Saml2Settings injectIntoSettings(Saml2Settings settings, Map<String, Object> metadataInfo) {
-		if (metadataInfo == null) {
+		if (metadataInfo == null || metadataInfo.isEmpty()) {
 			return settings;
 		}
 		SettingsBuilder settingsBuilder = new SettingsBuilder().fromValues(metadataInfo);
