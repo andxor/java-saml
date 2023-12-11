@@ -96,6 +96,8 @@ public class SamlResponse {
 
 	private String inResponseTo;
 
+	private String authContextClassRef;
+
 	public static final String FORMAT_ISSUER = "urn:oasis:names:tc:SAML:2.0:nameid-format:entity";
 
 	/**
@@ -291,6 +293,8 @@ public class SamlResponse {
 						"https://www.spid.gov.it/SpidL3")
 						.contains(authContextClassRefValue)) {
 					throw new ValidationError("Wrong AuthnContextClassRef value", ValidationError.WRONG_AUTH_CONTEXT_CLASS_REF);
+				} else {
+					this.authContextClassRef = authContextClassRefValue;
 				}
 
 
@@ -1445,4 +1449,11 @@ public class SamlResponse {
 		return inResponseTo;
 	}
 
+	public String getAuthContextClassRef() {
+		return authContextClassRef;
+	}
+
+	public void setAuthContextClassRef(String authContextClassRef) {
+		this.authContextClassRef = authContextClassRef;
+	}
 }
