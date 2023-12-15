@@ -1,5 +1,8 @@
 package com.onelogin.saml2.exception;
 
+import java.util.Locale;
+import java.util.ResourceBundle;
+
 public class ValidationError extends SAMLException {
 
 	private static final long serialVersionUID = 1L;
@@ -70,11 +73,13 @@ public class ValidationError extends SAMLException {
 
 	private final int errorCode;
 
+
+	public static final String ERROR_PREFIX = "saml_error_";
 	public ValidationError(String message, int errorCode) {
 		super(message);
 		this.errorCode = errorCode;
 	}
-	
+
 	public int getErrorCode() {
 		return errorCode;
 	}
