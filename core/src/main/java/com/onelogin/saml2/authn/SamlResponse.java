@@ -787,7 +787,7 @@ public class SamlResponse {
             if (responseIssuer.getLength() == 1) {
                 Node formatAttribute = responseIssuer.item(0).getAttributes().getNamedItem("Format");
                 if (formatAttribute == null) {
-                    throw new ValidationError("Issuer does not have Format attribute", ValidationError.MISSING_ISSUER_FORMAT_ATTRIBUTE);
+                    return null;
                 }
                 if (!FORMAT_ISSUER.equals(formatAttribute.getTextContent())) {
                     throw new ValidationError("Issuer format should be 'urn:oasis:names:tc:SAML:2.0:nameid-format:entity'. It is: " + formatAttribute.getNodeValue(), ValidationError.WRONG_ISSUER_FORMAT_ATTRIBUTE);
