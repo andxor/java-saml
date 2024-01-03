@@ -71,7 +71,7 @@ public class Saml2SettingsTest {
 	 * @see com.onelogin.saml2.settings.Saml2Settings#checkIdPSettings
 	 */
 	@Test
-	public void testCheckIdPSettingsAllErrors() throws IOException, Error {
+	public void testCheckIdPSettingsAllErrors() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.idperrors.properties").build();
 		List<String> settingsErrors = settings.checkIdPSettings();
 		assertFalse(settingsErrors.isEmpty());
@@ -91,7 +91,7 @@ public class Saml2SettingsTest {
 	 * @see com.onelogin.saml2.settings.Saml2Settings#checkIdPSettings
 	 */
 	@Test
-	public void testCheckIdPSettingsOk() throws IOException, Error {
+	public void testCheckIdPSettingsOk() throws  Exception{
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.all.properties").build();
 		List<String> settingsErrors = settings.checkIdPSettings();
 		assertTrue(settingsErrors.isEmpty());
@@ -107,7 +107,7 @@ public class Saml2SettingsTest {
 	 * @see com.onelogin.saml2.settings.Saml2Settings#checkSPSettings
 	 */
 	@Test
-	public void testCheckSPSettingsAllErrors() throws IOException, Error {
+	public void testCheckSPSettingsAllErrors() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.sperrors.properties").build();
 		List<String> settingsErrors = settings.checkSPSettings();
 		assertFalse(settingsErrors.isEmpty());
@@ -142,7 +142,7 @@ public class Saml2SettingsTest {
 	 * @see com.onelogin.saml2.settings.Saml2Settings#checkSPSettings
 	 */
 	@Test
-	public void testCheckSPSettingsOk() throws IOException, Error {
+	public void testCheckSPSettingsOk() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.all.properties").build();
 		List<String> settingsErrors = settings.checkSPSettings();
 		assertTrue(settingsErrors.isEmpty());
@@ -167,7 +167,7 @@ public class Saml2SettingsTest {
 	 * @see com.onelogin.saml2.settings.Saml2Settings#checkSettings
 	 */
 	@Test
-	public void testCheckSettingsAllErrors() throws IOException, Error {
+	public void testCheckSettingsAllErrors() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.allerrors.properties").build();
 		List<String> settingsErrors = settings.checkSettings();
 		assertFalse(settingsErrors.isEmpty());
@@ -209,7 +209,7 @@ public class Saml2SettingsTest {
 	 * @see com.onelogin.saml2.settings.Saml2Settings#checkSettings
 	 */
 	@Test
-	public void testCheckSettingsIdPErrors() throws IOException, Error {
+	public void testCheckSettingsIdPErrors() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.idperrors.properties").build();
 		List<String> settingsErrors = settings.checkSettings();
 		assertFalse(settingsErrors.isEmpty());
@@ -248,7 +248,7 @@ public class Saml2SettingsTest {
 	 * @see com.onelogin.saml2.settings.Saml2Settings#checkSettings
 	 */
 	@Test
-	public void testCheckSettingsOk() throws IOException, Error {
+	public void testCheckSettingsOk() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.all.properties").build();
 		List<String> settingsErrors = settings.checkSettings();
 		assertTrue(settingsErrors.isEmpty());
@@ -266,7 +266,7 @@ public class Saml2SettingsTest {
 	 * @see com.onelogin.saml2.settings.Saml2Settings#checkSPSettings
 	 */
 	@Test
-	public void testCheckSpSettingsWhenSettingHsm() throws IOException, Error {
+	public void testCheckSpSettingsWhenSettingHsm() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.hsm.properties").build();
 		settings.setHsm(new AzureKeyVault("", "", "", ""));
 
@@ -285,7 +285,7 @@ public class Saml2SettingsTest {
 	 * @see com.onelogin.saml2.settings.Saml2Settings#checkSPSettings
 	 */
 	@Test
-	public void testCheckSpSettingsWhenSettingBothHsmAndPrivateKey() throws IOException, Error {
+	public void testCheckSpSettingsWhenSettingBothHsmAndPrivateKey() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.all.properties").build();
 		settings.setHsm(new AzureKeyVault("", "", "", ""));
 

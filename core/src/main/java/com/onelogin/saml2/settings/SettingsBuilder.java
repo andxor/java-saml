@@ -3,16 +3,13 @@ package com.onelogin.saml2.settings;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.security.Key;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.UnrecoverableKeyException;
+import java.security.*;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -30,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import com.onelogin.saml2.exception.Error;
 import com.onelogin.saml2.util.Constants;
 import com.onelogin.saml2.util.Util;
+import reactor.util.annotation.NonNull;
 
 /**
  * SettingsBuilder class of Java Toolkit.
@@ -64,7 +62,9 @@ public class SettingsBuilder {
 	public final static String SP_NAMEIDFORMAT_PROPERTY_KEY = "onelogin.saml2.sp.nameidformat";
 
 	public final static String SP_X509CERT_PROPERTY_KEY = "onelogin.saml2.sp.x509cert";
+	public final static String SP_X509CERT_FILE_PROPERTY_KEY = "onelogin.saml2.sp.x509cert.file";
 	public final static String SP_PRIVATEKEY_PROPERTY_KEY = "onelogin.saml2.sp.privatekey";
+	public final static String SP_PRIVATEKEY_FILE_PROPERTY_KEY = "onelogin.saml2.sp.privatekey.file";
 	public final static String SP_X509CERTNEW_PROPERTY_KEY = "onelogin.saml2.sp.x509certNew";
 
 	public final static String SP_CONTACT_PROPERTY_KEY_PREFIX = "onelogin.saml2.sp.contact";
@@ -281,7 +281,7 @@ public class SettingsBuilder {
 	 * @return the Saml2Settings object with all the SAML settings loaded
 	 *
 	 */
-	public Saml2Settings build() {
+	public Saml2Settings build() throws Exception {
 		return build(new Saml2Settings());
 	}
 
@@ -294,7 +294,7 @@ public class SettingsBuilder {
 	 * @return the Saml2Settings object with all the SAML settings loaded
 	 *
 	 */
-	public Saml2Settings build(Saml2Settings saml2Setting) {
+	public Saml2Settings build(Saml2Settings saml2Setting) throws Exception {
 
 		this.saml2Setting = saml2Setting;
 
@@ -838,7 +838,7 @@ public class SettingsBuilder {
 	/**
 	 * Loads the SP settings from the properties file
 	 */
-	private void loadSpSetting() {
+	private void loadSpSetting() throws Exception {
 		String spEntityID = loadStringProperty(SP_ENTITYID_PROPERTY_KEY);
 		if (spEntityID != null) {
 			saml2Setting.setSpEntityId(spEntityID);
@@ -879,6 +879,8 @@ public class SettingsBuilder {
 		boolean keyStoreEnabled = this.samlData.get(KEYSTORE_KEY) != null && this.samlData.get(KEYSTORE_ALIAS) != null
 				&& this.samlData.get(KEYSTORE_KEY_PASSWORD) != null;
 
+
+
 		X509Certificate spX509cert;
 		PrivateKey spPrivateKey;
 
@@ -890,8 +892,8 @@ public class SettingsBuilder {
 			spX509cert = getCertificateFromKeyStore(ks, alias, password);
 			spPrivateKey = getPrivateKeyFromKeyStore(ks, alias, password);
 		} else {
-			spX509cert = loadCertificateFromProp(SP_X509CERT_PROPERTY_KEY);
-			spPrivateKey = loadPrivateKeyFromProp(SP_PRIVATEKEY_PROPERTY_KEY);
+			spX509cert =  Objects.requireNonNullElse(loadCertificateFromFile(loadStringProperty(SP_X509CERT_FILE_PROPERTY_KEY)), loadCertificateFromProp(SP_X509CERT_PROPERTY_KEY));
+			spPrivateKey = Objects.requireNonNullElse(loadPrivateKeyFromFile(loadStringProperty(SP_PRIVATEKEY_FILE_PROPERTY_KEY)), loadPrivateKeyFromProp(SP_PRIVATEKEY_PROPERTY_KEY));
 		}
 
 		if (spX509cert != null) {
@@ -1111,31 +1113,34 @@ public class SettingsBuilder {
 	 *
 	 * @return the X509Certificate object
 	 */
-	/*
-	protected X509Certificate loadCertificateFromFile(String filename) {
-		String certString = null;
-		try {
-			certString = Util.getFileAsString(filename.trim());
-		} catch (URISyntaxException e) {
-			LOGGER.error("Error loading certificate from file.", e);
-			return null;
-		}
-		catch (IOException e) {
-			LOGGER.error("Error loading certificate from file.", e);
-			return null;
-		}
 
-		try {
+	protected X509Certificate loadCertificateFromFile(String filename) throws Exception {
+			String certString = loadFFile(filename);
 			return Util.loadCert(certString);
-		} catch (CertificateException e) {
-			LOGGER.error("Error loading certificate from file.", e);
-			return null;
-		} catch (UnsupportedEncodingException e) {
-			LOGGER.error("the certificate is not in correct format.", e);
+	}
+
+
+	/**
+	 * Loads a property of the type PrivateKey from file
+	 *
+	 * @param filename the file name of the file that contains the X509Certificate
+	 *
+	 * @return the X509Certificate object
+	 */
+
+	protected PrivateKey loadPrivateKeyFromFile(String filename) throws Exception {
+			String keyString = loadFFile(filename);
+			return Util.loadPrivateKey(keyString.trim());
+	}
+
+
+	private String loadFFile(String filename) throws IOException {
+		if (filename == null) {
 			return null;
 		}
+		return Files.readString(Path.of(filename.trim()));
 	}
-	*/
+
 
 	/**
 	 * Loads a property of the type PrivateKey from the Properties object

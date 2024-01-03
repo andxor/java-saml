@@ -112,7 +112,7 @@ public class MetadataTest {
 	 * @see com.onelogin.saml2.settings.Metadata
 	 */
 	@Test
-	public void testMetadataExpiration() throws IOException, CertificateEncodingException, Error {
+	public void testMetadataExpiration() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.min.properties").build();
 
 		Metadata metadataObj = new Metadata(settings, null, null);
@@ -142,7 +142,7 @@ public class MetadataTest {
 	 * @see com.onelogin.saml2.settings.Metadata#toContactsXml
 	 */
 	@Test
-	public void testToContactsXml() throws IOException, CertificateEncodingException, Error {
+	public void testToContactsXml() throws Exception {
 		Saml2Settings settings = getSettingFromAllProperties();
 		Metadata metadataObj = new Metadata(settings);
 		String metadataStr = metadataObj.getMetadataString();
@@ -171,7 +171,7 @@ public class MetadataTest {
 	 * @see com.onelogin.saml2.settings.Metadata#toContactsXml
 	 */
 	@Test
-	public void testToContactsXmlSpecialChars() throws IOException, CertificateEncodingException, Error {
+	public void testToContactsXmlSpecialChars() throws Exception {
 		Saml2Settings settings = getSettingFromAllSpecialCharsProperties();
 		Metadata metadataObj = new Metadata(settings);
 		String metadataStr = metadataObj.getMetadataString();
@@ -198,7 +198,7 @@ public class MetadataTest {
 	 * @see com.onelogin.saml2.settings.Metadata#toContactsXml
 	 */
 	@Test
-	public void testToContactsXmlLegacy() throws IOException, CertificateEncodingException, Error {
+	public void testToContactsXmlLegacy() throws Exception {
 		Saml2Settings settings = getSettingFromAllProperties();
 		Metadata metadataObj = new Metadata(settings);
 		String metadataStr = metadataObj.getMetadataString();
@@ -227,7 +227,7 @@ public class MetadataTest {
 	 * @see com.onelogin.saml2.settings.Metadata#toContactsXml
 	 */
 	@Test
-	public void testToContactsXmlLegacySpecialChars() throws IOException, CertificateEncodingException, Error {
+	public void testToContactsXmlLegacySpecialChars() throws Exception {
 		Saml2Settings settings = getSettingFromAllSpecialCharsProperties();
 		Metadata metadataObj = new Metadata(settings);
 		String metadataStr = metadataObj.getMetadataString();
@@ -247,7 +247,7 @@ public class MetadataTest {
 	 * @see com.onelogin.saml2.settings.Metadata#toOrganizationXml
 	 */
 	@Test
-	public void testToOrganizationXml() throws IOException, CertificateEncodingException, Error {
+	public void testToOrganizationXml() throws Exception {
 		Saml2Settings settings = getSettingFromAllProperties();
 		Metadata metadataObj = new Metadata(settings);
 		String metadataStr = metadataObj.getMetadataString();
@@ -271,7 +271,7 @@ public class MetadataTest {
 	 * @see com.onelogin.saml2.settings.Metadata#toOrganizationXml
 	 */
 	@Test
-	public void testToNonLocalizedOrganizationXml() throws IOException, CertificateEncodingException, Error {
+	public void testToNonLocalizedOrganizationXml() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.org.properties").build();
 		Metadata metadataObj = new Metadata(settings);
 		String metadataStr = metadataObj.getMetadataString();
@@ -296,7 +296,7 @@ public class MetadataTest {
 	 * @see com.onelogin.saml2.settings.Metadata#toOrganizationXml
 	 */
 	@Test
-	public void testToLocalizedOrganizationXml() throws IOException, CertificateEncodingException, Error {
+	public void testToLocalizedOrganizationXml() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.org.localized.properties").build();
 		Metadata metadataObj = new Metadata(settings);
 		String metadataStr = metadataObj.getMetadataString();
@@ -322,7 +322,7 @@ public class MetadataTest {
 	 * @see com.onelogin.saml2.settings.Metadata#toOrganizationXml
 	 */
 	@Test
-	public void testToOrganizationXmlSpecialChars() throws IOException, CertificateEncodingException, Error {
+	public void testToOrganizationXmlSpecialChars() throws Exception {
 		Saml2Settings settings = getSettingFromAllSpecialCharsProperties();
 		Metadata metadataObj = new Metadata(settings);
 		String metadataStr = metadataObj.getMetadataString();
@@ -340,7 +340,7 @@ public class MetadataTest {
 	 * @see com.onelogin.saml2.settings.Metadata#toSLSXml
 	 */
 	@Test
-	public void testToSLSXml() throws IOException, CertificateEncodingException, Error {
+	public void testToSLSXml() throws Exception {
 		Saml2Settings settings = getSettingFromAllProperties();
 		Metadata metadataObj = new Metadata(settings);
 		String metadataStr = metadataObj.getMetadataString();
@@ -367,7 +367,7 @@ public class MetadataTest {
 	 * @see com.onelogin.saml2.settings.Metadata#toSLSXml
 	 */
 	@Test
-	public void testToSLSXmlSpecialChars() throws IOException, CertificateEncodingException, Error {
+	public void testToSLSXmlSpecialChars() throws Exception {
 		Saml2Settings settings = getSettingFromAllSpecialCharsProperties();
 		Metadata metadataObj = new Metadata(settings);
 		String metadataStr = metadataObj.getMetadataString();
@@ -386,7 +386,7 @@ public class MetadataTest {
 	 * @see com.onelogin.saml2.settings.Metadata#toX509KeyDescriptorsXML
 	 */
 	@Test
-	public void testToX509KeyDescriptorsXML() throws IOException, CertificateEncodingException, Error {
+	public void testToX509KeyDescriptorsXML() throws Exception {
 		Saml2Settings settings = getSettingFromAllProperties();
 		Metadata metadataObj = new Metadata(settings);
 		String metadataStr = metadataObj.getMetadataString();
@@ -421,7 +421,7 @@ public class MetadataTest {
 	 * @see com.onelogin.saml2.settings.Metadata#toX509KeyDescriptorsXML
 	 */
 	@Test
-	public void testToX509KeyDescriptorsXMLEncryption() throws IOException, CertificateEncodingException, Error {
+	public void testToX509KeyDescriptorsXMLEncryption() throws Exception {
 		Saml2Settings settings = getSettingFromAllProperties();
 		String keyDescriptorEncStr = "<md:KeyDescriptor use=\"encryption\"><ds:KeyInfo xmlns:ds=\"http://www.w3.org/2000/09/xmldsig#\"><ds:X509Data><ds:X509Certificate>MIICeDCCAeGgAwIBAgIBADANBgkqhkiG9w0BAQ0FADBZMQswCQYDVQQGEwJ1czET";
 
@@ -459,7 +459,7 @@ public class MetadataTest {
 	 * @see com.onelogin.saml2.settings.Metadata#getAttributeConsumingServiceXml
 	 */
 
-	public void testToAttributeConsumingServicesXmlLegacy() throws IOException, CertificateEncodingException, Error {
+	public void testToAttributeConsumingServicesXmlLegacy() throws Exception {
 		Saml2Settings settings = getSettingFromAllProperties();
 
 		AttributeConsumingService attributeConsumingService = new AttributeConsumingService(0, true, "Test Service", "Test Service Desc", "en");
@@ -502,7 +502,7 @@ public class MetadataTest {
 	 * @see com.onelogin.saml2.settings.Metadata#toAttributeConsumingServicesXml
 	 */
 	@Test
-	public void testToAttributeConsumingServicesXmlLegacySpecialChars() throws IOException, CertificateEncodingException, Error {
+	public void testToAttributeConsumingServicesXmlLegacySpecialChars() throws Exception {
 		Saml2Settings settings = getSettingFromAllProperties();
 
 		AttributeConsumingService attributeConsumingService = new AttributeConsumingService(0, true, "T&st Service", "T&st Service Desc");
@@ -543,7 +543,7 @@ public class MetadataTest {
 	 */
 
 	@Test
-	public void testToAttributeConsumingServiceXmlNoIndexLegacy() throws IOException, CertificateEncodingException, Error {
+	public void testToAttributeConsumingServiceXmlNoIndexLegacy() throws Exception {
 		Saml2Settings settings = getSettingFromAllProperties();
 
 		AttributeConsumingService attributeConsumingService = new AttributeConsumingService("Test Service", "Test Service Desc");
@@ -586,7 +586,7 @@ public class MetadataTest {
 	 * @see com.onelogin.saml2.settings.Metadata#getAttributeConsumingServiceXml
 	 */
 	@Test
-	public void testToAttributeConsumingServiceXmlNoIndexLegacySpecialChars() throws IOException, CertificateEncodingException, Error {
+	public void testToAttributeConsumingServiceXmlNoIndexLegacySpecialChars() throws Exception {
 		Saml2Settings settings = getSettingFromAllProperties();
 
 		AttributeConsumingService attributeConsumingService = new AttributeConsumingService("T&st Service", "T&st Service Desc");
@@ -625,7 +625,7 @@ public class MetadataTest {
 	 * @see com.onelogin.saml2.settings.Metadata#getAttributeConsumingServiceXml
 	 */
 	@Test
-	public void testToAttributeConsumingServiceXmlWithMultipleAttributeValueLegacy() throws IOException, CertificateEncodingException, Error {
+	public void testToAttributeConsumingServiceXmlWithMultipleAttributeValueLegacy() throws Exception {
 		Saml2Settings settings = getSettingFromAllProperties();
 
 		AttributeConsumingService attributeConsumingService = new AttributeConsumingService(0, true, "Test Service", "Test Service Desc", "en");
@@ -671,7 +671,7 @@ public class MetadataTest {
 	 * @see com.onelogin.saml2.settings.Metadata#getAttributeConsumingServiceXml
 	 */
 	@Test
-	public void testToAttributeConsumingServiceXmlWithMultipleAttributeValueLegacySpecialChars() throws IOException, CertificateEncodingException, Error {
+	public void testToAttributeConsumingServiceXmlWithMultipleAttributeValueLegacySpecialChars() throws Exception {
 		Saml2Settings settings = getSettingFromAllProperties();
 
 		AttributeConsumingService attributeConsumingService = new AttributeConsumingService("T&st Service", "T&st Service Desc");
@@ -717,7 +717,7 @@ public class MetadataTest {
 	 * @see com.onelogin.saml2.settings.Metadata#toAttributeConsumingServicesXml
 	 */
 	@Test
-	public void testToAttributeConsumingServiceXmlSingleService() throws IOException, CertificateEncodingException, Error {
+	public void testToAttributeConsumingServiceXmlSingleService() throws Exception {
 		Saml2Settings settings = getSettingFromAllProperties();
 
 		Metadata metadataObj = new Metadata(settings, null, null);
@@ -753,7 +753,7 @@ public class MetadataTest {
 	 * @see com.onelogin.saml2.settings.Metadata#toAttributeConsumingServicesXml
 	 */
 	@Test
-	public void testToAttributeConsumingServiceXmlSingleACSSpecialChars() throws IOException, CertificateEncodingException, Error {
+	public void testToAttributeConsumingServiceXmlSingleACSSpecialChars() throws Exception {
 		Saml2Settings settings = getSettingFromAllSpecialCharsProperties();
 
 		Metadata metadataObj = new Metadata(settings, null, null);
@@ -788,7 +788,7 @@ public class MetadataTest {
 	 * @see com.onelogin.saml2.settings.Metadata#toAttributeConsumingServicesXml
 	 */
 	@Test
-	public void testToAttributeConsumingServiceXmlMultiServices() throws IOException, CertificateEncodingException, Error {
+	public void testToAttributeConsumingServiceXmlMultiServices() throws Exception {
 		Saml2Settings settings = getSettingFromAllPropertiesMultiAttributeConsumingServices();
 
 		Metadata metadataObj = new Metadata(settings, null, null);
@@ -839,7 +839,7 @@ public class MetadataTest {
 	}
 
 
-	private Saml2Settings getSettingFromAllPropertiesMultiAttributeConsumingServices() throws Error, IOException {
+	private Saml2Settings getSettingFromAllPropertiesMultiAttributeConsumingServices() throws Exception {
 		return new SettingsBuilder().fromFile("config/config.all_multi_attribute_consuming_services.properties").build();
 	}
 
@@ -892,7 +892,7 @@ public class MetadataTest {
 	 * @see com.onelogin.saml2.settings.Metadata#signMetadata
 	 */
 	@Test
-	public void testSigngeneratedMetadata() throws Error, IOException, GeneralSecurityException, XPathExpressionException, XMLSecurityException {
+	public void testSigngeneratedMetadata() throws Exception {
 		Saml2Settings settings = getSettingFromAllProperties();
 		String certString = Util.getFileAsString("data/customPath/certs/sp.crt");
 		X509Certificate cert = Util.loadCert(certString);
@@ -920,16 +920,16 @@ public class MetadataTest {
 		assertEquals(digestAlgorithmSha512, digest_method_metadata_signed.getAttributes().getNamedItem("Algorithm").getNodeValue());
 	}
 
-	private Saml2Settings getSettingFromAllProperties() throws Error, IOException {
+	private Saml2Settings getSettingFromAllProperties() throws Exception {
 		return new SettingsBuilder().fromFile("config/config.all.properties").build();
 	}
 
-	private Saml2Settings getSettingFromAllSpecialCharsProperties() throws Error, IOException {
+	private Saml2Settings getSettingFromAllSpecialCharsProperties() throws Exception {
 		return new SettingsBuilder().fromFile("config/config.all_specialchars.properties").build();
 	}
 
 	@Test
-	public void shouldIncludeValidUntilAndDuration() throws CertificateEncodingException, Error, IOException {
+	public void shouldIncludeValidUntilAndDuration() throws Exception {
 		//given
 		Saml2Settings saml2Settings = getSettingFromAllProperties();
 
@@ -949,7 +949,7 @@ public class MetadataTest {
 	}
 
 	@Test
-	public void shouldIgnoreValidUntil() throws CertificateEncodingException, Error, IOException {
+	public void shouldIgnoreValidUntil() throws Exception {
 		//given
 		Saml2Settings saml2Settings = getSettingFromAllProperties();
 
@@ -968,7 +968,7 @@ public class MetadataTest {
 	}
 
 	@Test
-	public void shouldIgnoreCacheDuration() throws CertificateEncodingException, Error, IOException {
+	public void shouldIgnoreCacheDuration() throws Exception {
 		//given
 		Saml2Settings saml2Settings = getSettingFromAllProperties();
 

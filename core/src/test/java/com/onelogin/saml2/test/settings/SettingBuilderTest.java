@@ -58,7 +58,7 @@ public class SettingBuilderTest {
 	 * @see com.onelogin.saml2.settings.SettingsBuilder#fromFile
 	 */
 	@Test
-	public void testLoadFromFileNotExist() throws IOException, Error {
+	public void testLoadFromFileNotExist() throws Exception {
 		expectedEx.expect(Error.class);
 		expectedEx.expectMessage("properties file 'config/config.notfound.properties' not found in the classpath");
 
@@ -101,7 +101,7 @@ public class SettingBuilderTest {
 	 * @see com.onelogin.saml2.settings.SettingsBuilder#fromFile
 	 */
 	@Test
-	public void testLoadFromFileAndKeyStore() throws IOException, CertificateException, URISyntaxException, SettingsException, Error, KeyStoreException, NoSuchAlgorithmException {
+	public void testLoadFromFileAndKeyStore() throws Exception {
 		Saml2Settings setting = new SettingsBuilder().fromFile("config/config.empty.properties", getKeyStoreSettings()).build();
 
 		assertNotNull(setting.getSPcert() instanceof X509Certificate);
@@ -122,7 +122,7 @@ public class SettingBuilderTest {
 	 * @see com.onelogin.saml2.settings.SettingsBuilder#fromFile
 	 */
 	@Test
-	public void testLoadFromFileEmpty() throws IOException, CertificateException, URISyntaxException, SettingsException, Error {
+	public void testLoadFromFileEmpty() throws Exception {
 		Saml2Settings setting = new SettingsBuilder().fromFile("config/config.empty.properties").build();
 
 		assertFalse(setting.isDebugActive());
@@ -181,7 +181,7 @@ public class SettingBuilderTest {
 	 * @see com.onelogin.saml2.settings.SettingsBuilder#fromFile
 	 */
 	@Test
-	public void testLoadFromFileMinProp() throws IOException, CertificateException, URISyntaxException, SettingsException, Error {
+	public void testLoadFromFileMinProp() throws Exception {
 		Saml2Settings setting = new SettingsBuilder().fromFile("config/config.min.properties").build();
 
 		assertFalse(setting.isDebugActive());
@@ -243,7 +243,7 @@ public class SettingBuilderTest {
 	 * @see com.onelogin.saml2.settings.SettingsBuilder#fromFile
 	 */
 	@Test
-	public void testLoadFromFileAllProp() throws IOException, CertificateException, URISyntaxException, SettingsException, Error {
+	public void testLoadFromFileAllProp() throws Exception {
 		Saml2Settings setting = new SettingsBuilder().fromFile("config/config.all.properties").build();
 
 		assertTrue(setting.isDebugActive());
@@ -378,7 +378,7 @@ public class SettingBuilderTest {
 	 * @see com.onelogin.saml2.settings.SettingsBuilder#fromFile
 	 */
 	@Test
-	public void testLoadFromFileAllPropMultiAttributeConsumingServices() throws IOException, CertificateException, URISyntaxException, SettingsException, Error {
+	public void testLoadFromFileAllPropMultiAttributeConsumingServices() throws Exception {
 		Saml2Settings setting = new SettingsBuilder().fromFile("config/config.all_multi_attribute_consuming_services.properties").build();
 
 		// let's test only the Attribute Consuming Service part - no need to test again all the rest
@@ -442,7 +442,7 @@ public class SettingBuilderTest {
 	 * @see com.onelogin.saml2.settings.SettingsBuilder#fromFile
 	 */
 	@Test
-	public void testLoadFromFileCertString() throws IOException, CertificateException, URISyntaxException, SettingsException, Error {
+	public void testLoadFromFileCertString() throws Exception {
 		Saml2Settings setting = new SettingsBuilder().fromFile("config/config.certstring.properties").build();
 
 		assertFalse(setting.isDebugActive());
@@ -498,7 +498,7 @@ public class SettingBuilderTest {
 	 * @see com.onelogin.saml2.settings.SettingsBuilder#fromFile
 	 */
 	@Test
-	public void testLoadFromFileContactString() throws IOException, CertificateException, URISyntaxException, SettingsException, Error {
+	public void testLoadFromFileContactString() throws Exception {
 		Saml2Settings setting = new SettingsBuilder().fromFile("config/config.invalidcontacts.properties").build();
 
 		assertFalse(setting.isDebugActive());
@@ -563,7 +563,7 @@ public class SettingBuilderTest {
 	 * @see com.onelogin.saml2.settings.SettingsBuilder#fromFile
 	 */
 	@Test
-	public void testLoadFromFileInvalidSPCerts() throws IOException, CertificateException, URISyntaxException, SettingsException, Error {
+	public void testLoadFromFileInvalidSPCerts() throws Exception {
 		Saml2Settings setting = new SettingsBuilder().fromFile("config/config.invalidspcertstring.properties").build();
 
 		assertNull(setting.getSPkey());
@@ -583,7 +583,7 @@ public class SettingBuilderTest {
 	 * @see com.onelogin.saml2.settings.SettingsBuilder#fromFile
 	 */
 	@Test
-	public void testCompression() throws IOException, CertificateException, URISyntaxException, SettingsException, Error {
+	public void testCompression() throws Exception {
 		Saml2Settings setting = new SettingsBuilder().fromFile("config/config.min.properties").build();
 
 		assertTrue(setting.isCompressRequestEnabled());
@@ -610,7 +610,7 @@ public class SettingBuilderTest {
 	 * @see com.onelogin.saml2.settings.SettingsBuilder#fromFile
 	 */
 	@Test
-	public void testLoadFromFileSomeEmptyProp() throws IOException, CertificateException, URISyntaxException, Error {
+	public void testLoadFromFileSomeEmptyProp() throws Exception {
 		Saml2Settings setting = new SettingsBuilder().fromFile("config/config.somevaluesempty.properties").build();
 
 		assertTrue(setting.isDebugActive());
@@ -665,7 +665,7 @@ public class SettingBuilderTest {
 	 * @see com.onelogin.saml2.settings.SettingsBuilder#fromFile
 	 */
 	@Test
-	public void testLoadFromFileDifferentProp() throws IOException, CertificateException, URISyntaxException, Error {
+	public void testLoadFromFileDifferentProp() throws Exception {
 		Saml2Settings setting = new SettingsBuilder().fromFile("config/config.different.properties").build();
 
 		assertTrue(setting.isDebugActive());
@@ -750,7 +750,7 @@ public class SettingBuilderTest {
 	 * @see com.onelogin.saml2.settings.SettingsBuilder#fromProperties
 	 */
 	@Test
-	public void testFromProperties() throws IOException, Error, CertificateException {
+	public void testFromProperties() throws Exception {
 		Saml2Settings setting = new SettingsBuilder().fromFile("config/config.min.properties").build();
 
 		Base64 encoder = new Base64(64);

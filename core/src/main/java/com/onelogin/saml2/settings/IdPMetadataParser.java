@@ -312,7 +312,7 @@ public class IdPMetadataParser {
 	 *
 	 * @return the Saml2Settings object with metadata info settings loaded
 	 */
-	public static Saml2Settings injectIntoSettings(Saml2Settings settings, Map<String, Object> metadataInfo) {
+	public static Saml2Settings injectIntoSettings(Saml2Settings settings, Map<String, Object> metadataInfo) throws Exception {
 		if (metadataInfo == null || metadataInfo.isEmpty()) {
 			return settings;
 		}

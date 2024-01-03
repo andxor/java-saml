@@ -670,7 +670,7 @@ public class LogoutRequestTest {
 	 * @see com.onelogin.saml2.logout.LogoutRequest#getSessionIndexes
 	 */
 	@Test
-	public void testGetSessionIndexes() throws URISyntaxException, IOException, XPathExpressionException, XMLEntityException, Error {
+	public void testGetSessionIndexes() throws Exception {
 		String logoutRequestStr = Util.getFileAsString("data/logout_requests/logout_request.xml");
 		List<String> expectedIndexes = new ArrayList<String>();
 		List <String> indexes = LogoutRequest.getSessionIndexes(logoutRequestStr);
