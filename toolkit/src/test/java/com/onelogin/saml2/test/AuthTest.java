@@ -115,7 +115,7 @@ public class AuthTest {
 	 * @see com.onelogin.saml2.Auth
 	 */
 	@Test
-	public void testConstructor() throws IOException, SettingsException, Error {
+	public void testConstructor() throws Exception {
 		Auth auth = new Auth();
         assertNotNull(auth.getSettings());
 
@@ -136,7 +136,7 @@ public class AuthTest {
 	 * @see com.onelogin.saml2.Auth
 	 */
 	@Test
-	public void testConstructorWithFilename() throws IOException, SettingsException, Error {
+	public void testConstructorWithFilename() throws Exception {
 		Auth auth = new Auth("config/config.min.properties");
         assertNotNull(auth.getSettings());
 
@@ -160,7 +160,7 @@ public class AuthTest {
      * @see com.onelogin.saml2.Auth
      */
 	@Test
-	public void testConstructorWithFilenameAndKeyStore() throws IOException, SettingsException, Error, NoSuchAlgorithmException, CertificateException, KeyStoreException, UnrecoverableKeyException {
+	public void testConstructorWithFilenameAndKeyStore() throws Exception {
         
 		Auth auth = new Auth("config/config.min.properties", getKeyStoreSettings());
         assertNotNull(auth.getSettings());
@@ -184,7 +184,7 @@ public class AuthTest {
 	 * @see com.onelogin.saml2.Auth
 	 */
 	@Test
-	public void testConstructorWithReqRes() throws IOException, SettingsException, URISyntaxException, Error {
+	public void testConstructorWithReqRes() throws Exception {
 		HttpServletRequest request = mock(HttpServletRequest.class);
 		HttpServletResponse response = mock(HttpServletResponse.class);
 		String samlResponseEncoded = Util.getFileAsString("data/responses/response1.xml.base64");
@@ -213,7 +213,7 @@ public class AuthTest {
 	 * @see com.onelogin.saml2.Auth
 	 */
 	@Test
-	public void testConstructorWithReqResAndKeyStore() throws IOException, SettingsException, URISyntaxException, Error, KeyStoreException, NoSuchAlgorithmException, CertificateException {
+	public void testConstructorWithReqResAndKeyStore() throws Exception, KeyStoreException, NoSuchAlgorithmException, CertificateException {
 		HttpServletRequest request = mock(HttpServletRequest.class);
 		HttpServletResponse response = mock(HttpServletResponse.class);
 
@@ -239,7 +239,7 @@ public class AuthTest {
 	 * @see com.onelogin.saml2.Auth
 	 */
 	@Test
-	public void testConstructorWithFilenameReqRes() throws IOException, SettingsException, URISyntaxException, Error {
+	public void testConstructorWithFilenameReqRes() throws Exception {
 		HttpServletRequest request = mock(HttpServletRequest.class);
 		HttpServletResponse response = mock(HttpServletResponse.class);
 		String samlResponseEncoded = Util.getFileAsString("data/responses/response1.xml.base64");
@@ -265,7 +265,7 @@ public class AuthTest {
 	 * @see com.onelogin.saml2.Auth
 	 */
 	@Test
-	public void testConstructorWithSettingsReqRes() throws IOException, SettingsException, URISyntaxException, Error {
+	public void testConstructorWithSettingsReqRes() throws Exception {
 		HttpServletRequest request = mock(HttpServletRequest.class);
 		HttpServletResponse response = mock(HttpServletResponse.class);
 		String samlResponseEncoded = Util.getFileAsString("data/responses/response1.xml.base64");
@@ -289,7 +289,7 @@ public class AuthTest {
 	 * @see com.onelogin.saml2.Auth
 	 */
 	@Test
-	public void testConstructorInvalidSettings() throws IOException, SettingsException, URISyntaxException, Error {
+	public void testConstructorInvalidSettings() throws Exception {
 		HttpServletRequest request = mock(HttpServletRequest.class);
 		HttpServletResponse response = mock(HttpServletResponse.class);
 		String samlResponseEncoded = Util.getFileAsString("data/responses/response1.xml.base64");
@@ -312,7 +312,7 @@ public class AuthTest {
 	 * @see com.onelogin.saml2.Auth#getSettings
 	 */
 	@Test
-	public void testGetSettings() throws IOException, SettingsException, Error {
+	public void testGetSettings() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("onelogin.saml.properties").build();
 		Auth auth = new Auth();
 		assertEquals(settings.getIdpEntityId(), auth.getSettings().getIdpEntityId());
@@ -340,7 +340,7 @@ public class AuthTest {
 	 * @see com.onelogin.saml2.Auth#setStrict
 	 */
 	@Test
-	public void testSetStrict() throws IOException, SettingsException, URISyntaxException, Error {
+	public void testSetStrict() throws Exception {
 		Auth auth = new Auth();
 
 		auth.setStrict(false);
@@ -361,7 +361,7 @@ public class AuthTest {
 	 * @see com.onelogin.saml2.Auth#isDebugActive
 	 */
 	@Test
-	public void testIsDebugActive() throws IOException, SettingsException, URISyntaxException, Error {
+	public void testIsDebugActive() throws Exception {
 		HttpServletResponse response = mock(HttpServletResponse.class);
 		HttpServletRequest request = mock(HttpServletRequest.class);
 		String samlResponseEncoded = Util.getFileAsString("data/responses/response1.xml.base64");
@@ -389,7 +389,7 @@ public class AuthTest {
 	 * @see com.onelogin.saml2.Auth#getSSOurl
 	 */
 	@Test
-	public void testGetSSOurl() throws URISyntaxException, IOException, SettingsException, Error {
+	public void testGetSSOurl() throws Exception {
 		HttpServletRequest request = mock(HttpServletRequest.class);
 		HttpServletResponse response = mock(HttpServletResponse.class);
 		String samlResponseEncoded = Util.getFileAsString("data/responses/response1.xml.base64");
@@ -412,7 +412,7 @@ public class AuthTest {
 	 * @see com.onelogin.saml2.Auth#getSLOurl
 	 */
 	@Test
-	public void testGetSLOurl() throws URISyntaxException, IOException, SettingsException, Error {
+	public void testGetSLOurl() throws Exception {
 		HttpServletRequest request = mock(HttpServletRequest.class);
 		HttpServletResponse response = mock(HttpServletResponse.class);
 		String samlResponseEncoded = Util.getFileAsString("data/responses/response1.xml.base64");
@@ -436,7 +436,7 @@ public class AuthTest {
 	 * @see com.onelogin.saml2.Auth#getSLOResponseUrl
 	 */
 	@Test
-	public void testGetSLOResponseUrl() throws URISyntaxException, IOException, SettingsException, Error {
+	public void testGetSLOResponseUrl() throws Exception {
 		HttpServletRequest request = mock(HttpServletRequest.class);
 		HttpServletResponse response = mock(HttpServletResponse.class);
 		String samlResponseEncoded = Util.getFileAsString("data/responses/response1.xml.base64");
@@ -459,7 +459,7 @@ public class AuthTest {
 	 * @see com.onelogin.saml2.Auth#getSLOResponseUrl
 	 */
 	@Test
-	public void testGetSLOResponseUrlNull() throws URISyntaxException, IOException, SettingsException, Error {
+	public void testGetSLOResponseUrlNull() throws Exception {
 		HttpServletRequest request = mock(HttpServletRequest.class);
 		HttpServletResponse response = mock(HttpServletResponse.class);
 		String samlResponseEncoded = Util.getFileAsString("data/responses/response1.xml.base64");
@@ -1285,7 +1285,7 @@ public class AuthTest {
 	 * @see com.onelogin.saml2.Auth#login
 	 */
 	@Test
-	public void testLogin() throws IOException, SettingsException, URISyntaxException, Error {
+	public void testLogin() throws Exception {
 		HttpServletRequest request = mock(HttpServletRequest.class);
 		HttpServletResponse response = mock(HttpServletResponse.class);
 		when(request.getScheme()).thenReturn("http");
@@ -1313,7 +1313,7 @@ public class AuthTest {
 	 * @see com.onelogin.saml2.Auth#login
 	 */
 	@Test
-	public void testLoginWithRelayState() throws IOException, SettingsException, URISyntaxException, Error {
+	public void testLoginWithRelayState() throws Exception {
 		HttpServletRequest request = mock(HttpServletRequest.class);
 		HttpServletResponse response = mock(HttpServletResponse.class);
 		when(request.getScheme()).thenReturn("http");
@@ -1342,7 +1342,7 @@ public class AuthTest {
 	 * @see com.onelogin.saml2.Auth#login
 	 */
 	@Test
-	public void testLoginWithoutRelayState() throws IOException, SettingsException, URISyntaxException, Error {
+	public void testLoginWithoutRelayState() throws Exception {
 		HttpServletRequest request = mock(HttpServletRequest.class);
 		HttpServletResponse response = mock(HttpServletResponse.class);
 		when(request.getScheme()).thenReturn("http");
@@ -1373,7 +1373,7 @@ public class AuthTest {
 	 * @see com.onelogin.saml2.Auth#login
 	 */
 	@Test
-	public void testLoginWithExtraParameters() throws IOException, SettingsException, URISyntaxException, Error {
+	public void testLoginWithExtraParameters() throws Exception {
 		HttpServletRequest request = mock(HttpServletRequest.class);
 		HttpServletResponse response = mock(HttpServletResponse.class);
 		when(request.getScheme()).thenReturn("http");
@@ -1404,7 +1404,7 @@ public class AuthTest {
 	 * @see com.onelogin.saml2.Auth#login
 	 */
 	@Test
-	public void testLoginStay() throws IOException, SettingsException, URISyntaxException, Error {
+	public void testLoginStay() throws Exception {
 		HttpServletRequest request = mock(HttpServletRequest.class);
 		HttpServletResponse response = mock(HttpServletResponse.class);
 		when(request.getScheme()).thenReturn("http");
@@ -1438,7 +1438,7 @@ public class AuthTest {
 	 * @see com.onelogin.saml2.Auth#login
 	 */
 	@Test
-	public void testLoginSubject() throws IOException, SettingsException, URISyntaxException, Error {
+	public void testLoginSubject() throws Exception {
 		HttpServletRequest request = mock(HttpServletRequest.class);
 		HttpServletResponse response = mock(HttpServletResponse.class);
 		when(request.getScheme()).thenReturn("http");
@@ -1487,7 +1487,7 @@ public class AuthTest {
 	 * @see com.onelogin.saml2.Auth#login
 	 */
 	@Test
-	public void testLoginSignedFail() throws IOException, SettingsException, URISyntaxException, Error {
+	public void testLoginSignedFail() throws Exception {
 		HttpServletRequest request = mock(HttpServletRequest.class);
 		HttpServletResponse response = mock(HttpServletResponse.class);
 		when(request.getScheme()).thenReturn("http");
@@ -1516,7 +1516,7 @@ public class AuthTest {
 	 * @see com.onelogin.saml2.Auth#login
 	 */
 	@Test
-	public void testLoginSigned() throws IOException, SettingsException, URISyntaxException, Error {
+	public void testLoginSigned() throws Exception {
 		HttpServletRequest request = mock(HttpServletRequest.class);
 		HttpServletResponse response = mock(HttpServletResponse.class);
 		when(request.getScheme()).thenReturn("http");
@@ -1550,7 +1550,7 @@ public class AuthTest {
 	 * @see com.onelogin.saml2.Auth#logout
 	 */
 	@Test
-	public void testLogout() throws IOException, SettingsException, XMLEntityException, Error {
+	public void testLogout() throws Exception {
 		HttpServletRequest request = mock(HttpServletRequest.class);
 		HttpServletResponse response = mock(HttpServletResponse.class);
 		when(request.getScheme()).thenReturn("http");
@@ -1579,7 +1579,7 @@ public class AuthTest {
 	 * @see com.onelogin.saml2.Auth#logout
 	 */
 	@Test
-	public void testLogoutWithExtraParameters() throws IOException, SettingsException, XMLEntityException, Error {
+	public void testLogoutWithExtraParameters() throws Exception {
 		HttpServletRequest request = mock(HttpServletRequest.class);
 		HttpServletResponse response = mock(HttpServletResponse.class);
 		when(request.getScheme()).thenReturn("http");
@@ -1609,7 +1609,7 @@ public class AuthTest {
 	 * @see com.onelogin.saml2.Auth#logout
 	 */
 	@Test
-	public void testLogoutWithRelayState() throws IOException, SettingsException, XMLEntityException, Error {
+	public void testLogoutWithRelayState() throws Exception {
 		HttpServletRequest request = mock(HttpServletRequest.class);
 		HttpServletResponse response = mock(HttpServletResponse.class);
 		when(request.getScheme()).thenReturn("http");
@@ -1639,7 +1639,7 @@ public class AuthTest {
 	 * @see com.onelogin.saml2.Auth#logout
 	 */
 	@Test
-	public void testLogoutWithoutRelayState() throws IOException, SettingsException, XMLEntityException, Error {
+	public void testLogoutWithoutRelayState() throws Exception {
 		HttpServletRequest request = mock(HttpServletRequest.class);
 		HttpServletResponse response = mock(HttpServletResponse.class);
 		when(request.getScheme()).thenReturn("http");
@@ -1671,7 +1671,7 @@ public class AuthTest {
 	 * @see com.onelogin.saml2.Auth#logout
 	 */
 	@Test
-	public void testLogoutStay() throws IOException, SettingsException, XMLEntityException, Error {
+	public void testLogoutStay() throws Exception {
 		HttpServletRequest request = mock(HttpServletRequest.class);
 		HttpServletResponse response = mock(HttpServletResponse.class);
 		when(request.getScheme()).thenReturn("http");
@@ -1705,7 +1705,7 @@ public class AuthTest {
 	 * @see com.onelogin.saml2.Auth#logout
 	 */
 	@Test
-	public void testLogoutSignedFail() throws IOException, SettingsException, XMLEntityException, Error {
+	public void testLogoutSignedFail() throws Exception {
 		HttpServletRequest request = mock(HttpServletRequest.class);
 		HttpServletResponse response = mock(HttpServletResponse.class);
 		when(request.getScheme()).thenReturn("http");
@@ -1734,7 +1734,7 @@ public class AuthTest {
 	 * @see com.onelogin.saml2.Auth#logout
 	 */
 	@Test
-	public void testLogoutSigned() throws IOException, SettingsException, XMLEntityException, Error {
+	public void testLogoutSigned() throws Exception {
 		HttpServletRequest request = mock(HttpServletRequest.class);
 		HttpServletResponse response = mock(HttpServletResponse.class);
 		when(request.getScheme()).thenReturn("http");
@@ -1768,7 +1768,7 @@ public class AuthTest {
 	 * @see com.onelogin.saml2.Auth#buildRequestSignature
 	 */
 	@Test
-	public void testBuildRequestSignatureInvalidSP() throws URISyntaxException, IOException, SettingsException, Error {
+	public void testBuildRequestSignatureInvalidSP() throws Exception {
 		String deflatedEncodedAuthNRequest = Util.getFileAsString("data/requests/authn_request.xml.deflated.base64");
 		String relayState = "http://example.com";
 		String signAlgorithm = "http://www.w3.org/2000/09/xmldsig#rsa-sha1";
@@ -1792,7 +1792,7 @@ public class AuthTest {
 	 * @see com.onelogin.saml2.Auth#buildRequestSignature
 	 */
 	@Test
-	public void testBuildRequestSignatureRsaSha1() throws URISyntaxException, IOException, SettingsException, Error {
+	public void testBuildRequestSignatureRsaSha1() throws Exception {
 		String deflatedEncodedAuthNRequest = Util.getFileAsString("data/requests/authn_request.xml.deflated.base64");
 		String relayState = "http://example.com";
 		String signAlgorithm = Constants.RSA_SHA1;
@@ -1818,7 +1818,7 @@ public class AuthTest {
 	 * @see com.onelogin.saml2.Auth#buildRequestSignature
 	 */
 	@Test(expected=IllegalArgumentException.class)
-	public void testBuildRequestSignatureDsaSha1() throws URISyntaxException, IOException, SettingsException, Error {
+	public void testBuildRequestSignatureDsaSha1() throws Exception {
 		String deflatedEncodedAuthNRequest = Util.getFileAsString("data/requests/authn_request.xml.deflated.base64");
 		String relayState = "http://example.com";
 		String signAlgorithm = Constants.DSA_SHA1;
@@ -1839,7 +1839,7 @@ public class AuthTest {
 	 * @see com.onelogin.saml2.Auth#buildRequestSignature
 	 */
 	@Test
-	public void testBuildRequestSignatureRsaSha256() throws URISyntaxException, IOException, SettingsException, Error {
+	public void testBuildRequestSignatureRsaSha256() throws Exception {
 		String deflatedEncodedAuthNRequest = Util.getFileAsString("data/requests/authn_request.xml.deflated.base64");
 		String relayState = "http://example.com";
 		String signAlgorithm = Constants.RSA_SHA256;
@@ -1862,7 +1862,7 @@ public class AuthTest {
 	 * @see com.onelogin.saml2.Auth#buildRequestSignature
 	 */
 	@Test
-	public void testBuildRequestSignatureRsaSha384() throws URISyntaxException, IOException, SettingsException, Error {
+	public void testBuildRequestSignatureRsaSha384() throws Exception {
 		String deflatedEncodedAuthNRequest = Util.getFileAsString("data/requests/authn_request.xml.deflated.base64");
 		String relayState = "http://example.com";
 		String signAlgorithm = Constants.RSA_SHA384;
@@ -1885,7 +1885,7 @@ public class AuthTest {
 	 * @see com.onelogin.saml2.Auth#buildRequestSignature
 	 */
 	@Test
-	public void testBuildRequestSignatureRsaSha512() throws URISyntaxException, IOException, SettingsException, Error {
+	public void testBuildRequestSignatureRsaSha512() throws Exception {
 		String deflatedEncodedAuthNRequest = Util.getFileAsString("data/requests/authn_request.xml.deflated.base64");
 		String relayState = "http://example.com";		
 		String signAlgorithm = Constants.RSA_SHA512;
@@ -1908,7 +1908,7 @@ public class AuthTest {
 	 * @see com.onelogin.saml2.Auth#buildResponseSignature
 	 */
 	@Test
-	public void testBuildResponseSignatureRsaSha1() throws URISyntaxException, IOException, SettingsException, Error {
+	public void testBuildResponseSignatureRsaSha1() throws Exception {
 		String deflatedEncodedLogoutResponse = Util.getFileAsString("data/logout_responses/logout_response_deflated.xml.base64");
 		String relayState = "http://example.com";
 		String signAlgorithm = Constants.RSA_SHA1;
@@ -1934,7 +1934,7 @@ public class AuthTest {
 	 * @see com.onelogin.saml2.Auth#buildResponseSignature
 	 */
 	@Test(expected=IllegalArgumentException.class)
-	public void testBuildResponseSignatureDsaSha1() throws URISyntaxException, IOException, SettingsException, Error {
+	public void testBuildResponseSignatureDsaSha1() throws Exception {
 		String deflatedEncodedLogoutResponse = Util.getFileAsString("data/logout_responses/logout_response_deflated.xml.base64");
 		String relayState = "http://example.com";
 		String signAlgorithm = Constants.DSA_SHA1;
@@ -1955,7 +1955,7 @@ public class AuthTest {
 	 * @see com.onelogin.saml2.Auth#buildResponseSignature
 	 */
 	@Test
-	public void testBuildResponseSignatureRsaSha256() throws URISyntaxException, IOException, SettingsException, Error {
+	public void testBuildResponseSignatureRsaSha256() throws Exception {
 		String deflatedEncodedLogoutResponse = Util.getFileAsString("data/logout_responses/logout_response_deflated.xml.base64");
 		String relayState = "http://example.com";
 		String signAlgorithm = Constants.RSA_SHA256;
@@ -1978,7 +1978,7 @@ public class AuthTest {
 	 * @see com.onelogin.saml2.Auth#buildResponseSignature
 	 */
 	@Test
-	public void testBuildResponseSignatureRsaSha384() throws URISyntaxException, IOException, SettingsException, Error {
+	public void testBuildResponseSignatureRsaSha384() throws Exception {
 		String deflatedEncodedLogoutResponse = Util.getFileAsString("data/logout_responses/logout_response_deflated.xml.base64");
 		String relayState = "http://example.com";
 		String signAlgorithm = Constants.RSA_SHA384;
@@ -2001,7 +2001,7 @@ public class AuthTest {
 	 * @see com.onelogin.saml2.Auth#buildResponseSignature
 	 */
 	@Test
-	public void testBuildResponseSignatureRsaSha512() throws URISyntaxException, IOException, SettingsException, Error {
+	public void testBuildResponseSignatureRsaSha512() throws Exception {
 		String deflatedEncodedLogoutResponse = Util.getFileAsString("data/logout_responses/logout_response_deflated.xml.base64");
 		String relayState = "http://example.com";		
 		String signAlgorithm = Constants.RSA_SHA512;
@@ -2023,7 +2023,7 @@ public class AuthTest {
 	 * @see com.onelogin.saml2.Auth#buildSignature
 	 */
 	@Test
-	public void testBuildSignature() throws URISyntaxException, IOException, SettingsException, Error {
+	public void testBuildSignature() throws Exception {
 		String deflatedEncodedAuthNRequest = Util.getFileAsString("data/requests/authn_request.xml.deflated.base64");
 		String deflatedEncodedLogoutResponse = Util.getFileAsString("data/logout_responses/logout_response_deflated.xml.base64");
 		String relayState = "http://example.com";		
@@ -2086,7 +2086,7 @@ public class AuthTest {
 	 * @see com.onelogin.saml2.Auth#getLastRequestXML
 	 */
 	@Test
-	public void testGetLastAuthNRequest() throws IOException, SettingsException, Error {
+	public void testGetLastAuthNRequest() throws Exception {
 		HttpServletRequest request = mock(HttpServletRequest.class);
 		HttpServletResponse response = mock(HttpServletResponse.class);
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.min.properties").build();
@@ -2112,7 +2112,7 @@ public class AuthTest {
 	 * @see com.onelogin.saml2.Auth#getLastRequestXML
 	 */
 	@Test
-	public void testGetLastLogoutRequestSent() throws IOException, SettingsException, XMLEntityException, Error {
+	public void testGetLastLogoutRequestSent() throws Exception {
 		HttpServletRequest request = mock(HttpServletRequest.class);
 		HttpServletResponse response = mock(HttpServletResponse.class);
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.min.properties").build();

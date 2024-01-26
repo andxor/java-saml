@@ -182,7 +182,7 @@ public class Auth {
 	 * @throws SettingsException
 	 * @throws Error
 	 */
-	public Auth() throws IOException, SettingsException, Error {
+	public Auth() throws Exception {
 		this(new SettingsBuilder().fromFile("onelogin.saml.properties").build(), null, null);
 	}
 
@@ -195,7 +195,7 @@ public class Auth {
 	 * @throws SettingsException
 	 * @throws Error
 	 */
-	public Auth(KeyStoreSettings keyStoreSetting) throws IOException, SettingsException, Error {
+	public Auth(KeyStoreSettings keyStoreSetting) throws Exception {
 		this("onelogin.saml.properties", keyStoreSetting);
 	}
 
@@ -208,7 +208,7 @@ public class Auth {
 	 * @throws SettingsException
 	 * @throws Error
 	 */
-	public Auth(String filename) throws IOException, SettingsException, Error {
+	public Auth(String filename) throws Exception {
 		this(filename, null, null, null);
 	}
 
@@ -223,7 +223,7 @@ public class Auth {
 	 * @throws Error
 	 */
 	public Auth(String filename, KeyStoreSettings keyStoreSetting)
-			throws IOException, SettingsException, Error {
+			throws Exception {
 		this(new SettingsBuilder().fromFile(filename, keyStoreSetting).build(), null, null);
 	}
 
@@ -237,7 +237,7 @@ public class Auth {
 	 * @throws SettingsException
 	 * @throws Error
 	 */
-	public Auth(HttpServletRequest request, HttpServletResponse response) throws IOException, SettingsException, Error {
+	public Auth(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		this(new SettingsBuilder().fromFile("onelogin.saml.properties").build(), request, response);
 	}
 
@@ -253,7 +253,7 @@ public class Auth {
 	 * @throws Error
 	 */
 	public Auth(KeyStoreSettings keyStoreSetting, HttpServletRequest request, HttpServletResponse response)
-			throws IOException, SettingsException, Error {
+			throws Exception {
 		this(new SettingsBuilder().fromFile("onelogin.saml.properties", keyStoreSetting).build(), request,
 				response);
 	}
@@ -270,7 +270,7 @@ public class Auth {
 	 * @throws Error
 	 */
 	public Auth(String filename, HttpServletRequest request, HttpServletResponse response)
-			throws SettingsException, IOException, Error {
+			throws Exception {
 		this(filename, null, request, response);
 	}
 
@@ -287,7 +287,7 @@ public class Auth {
 	 * @throws Error
 	 */
 	public Auth(String filename, KeyStoreSettings keyStoreSetting, HttpServletRequest request,
-			HttpServletResponse response) throws SettingsException, IOException, Error {
+			HttpServletResponse response) throws Exception {
 		this(new SettingsBuilder().fromFile(filename, keyStoreSetting).build(), request, response);
 	}
 

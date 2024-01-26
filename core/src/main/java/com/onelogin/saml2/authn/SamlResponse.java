@@ -354,15 +354,23 @@ public class SamlResponse {
         } catch (Exception e) {
 			validationException = e;
 			if (e instanceof ValidationError) {
-				int errorCode = ((ValidationError) e).getErrorCode();
-				try {
-					String message = ResourceBundle.getBundle("saml_error", Locale.ITALIAN).getString(ValidationError.ERROR_PREFIX + errorCode);
-					validationException = new ValidationError(message, errorCode);
-				} catch (MissingResourceException missingResourceException) {
-					LOGGER.error("No message found for Validation Error code {}", errorCode, missingResourceException);
-				} catch (Exception exception) {
-					LOGGER.error("Could not translate the exception code {}", errorCode, exception);
-				}
+                int errorCode = ((ValidationError) e).getErrorCode();
+                String message = e.getMessage();
+                if (message.contains("ErrorCode")) {
+                    String[] errorSplit = message.split("->");
+                    if (errorSplit.length > 1) {
+                        validationException = new ValidationError(e.getMessage(),  errorCode);
+                    }
+                } else {
+                    try {
+                        message = ResourceBundle.getBundle("saml_error", Locale.ITALIAN).getString(ValidationError.ERROR_PREFIX + errorCode);
+                        validationException = new ValidationError(message, errorCode);
+                    } catch (MissingResourceException missingResourceException) {
+                        LOGGER.error("No message found for Validation Error code {}", errorCode, missingResourceException);
+                    } catch (Exception exception) {
+                        LOGGER.error("Could not translate the exception code {}", errorCode, exception);
+                    }
+                }
 
 			}
             LOGGER.debug("SAMLResponse invalid --> {}", samlResponseString);
