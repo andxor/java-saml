@@ -412,6 +412,62 @@ public class SettingsBuilder {
 	/**
 	 * Loads the IdP settings from the properties file
 	 */
+	public void loadIdpSettingFromMap(Map<String, Object> idpMap) {
+		String idpEntityID = loadStringProperty(IDP_ENTITYID_PROPERTY_KEY, idpMap);
+		if (idpEntityID != null) {
+			saml2Setting.setIdpEntityId(idpEntityID);
+		}
+
+		URL idpSingleSignOnServiceUrl = loadURLProperty(IDP_SINGLE_SIGN_ON_SERVICE_URL_PROPERTY_KEY, idpMap);
+		if (idpSingleSignOnServiceUrl != null) {
+			saml2Setting.setIdpSingleSignOnServiceUrl(idpSingleSignOnServiceUrl);
+		}
+
+		String idpSingleSignOnServiceBinding = loadStringProperty(IDP_SINGLE_SIGN_ON_SERVICE_BINDING_PROPERTY_KEY, idpMap);
+		if (idpSingleSignOnServiceBinding != null) {
+			saml2Setting.setIdpSingleSignOnServiceBinding(idpSingleSignOnServiceBinding);
+		}
+
+		URL idpSingleLogoutServiceUrl = loadURLProperty(IDP_SINGLE_LOGOUT_SERVICE_URL_PROPERTY_KEY, idpMap);
+		if (idpSingleLogoutServiceUrl != null) {
+			saml2Setting.setIdpSingleLogoutServiceUrl(idpSingleLogoutServiceUrl);
+		}
+
+		URL idpSingleLogoutServiceResponseUrl = loadURLProperty(IDP_SINGLE_LOGOUT_SERVICE_RESPONSE_URL_PROPERTY_KEY, idpMap);
+		if (idpSingleLogoutServiceResponseUrl != null) {
+			saml2Setting.setIdpSingleLogoutServiceResponseUrl(idpSingleLogoutServiceResponseUrl);
+		}
+
+		String idpSingleLogoutServiceBinding = loadStringProperty(IDP_SINGLE_LOGOUT_SERVICE_BINDING_PROPERTY_KEY, idpMap);
+		if (idpSingleLogoutServiceBinding != null) {
+			saml2Setting.setIdpSingleLogoutServiceBinding(idpSingleLogoutServiceBinding);
+		}
+
+		List<X509Certificate> idpX509certMulti = loadCertificateListFromProp(IDP_X509CERTMULTI_PROPERTY_KEY, idpMap);
+		if (idpX509certMulti != null) {
+			saml2Setting.setIdpx509certMulti(idpX509certMulti);
+		}
+
+		X509Certificate idpX509cert = loadCertificateFromPropMap(IDP_X509CERT_PROPERTY_KEY, idpMap);
+		if (idpX509cert != null) {
+			saml2Setting.setIdpx509cert(idpX509cert);
+		}
+
+		String idpCertFingerprint = loadStringProperty(CERTFINGERPRINT_PROPERTY_KEY, idpMap);
+		if (idpCertFingerprint != null) {
+			saml2Setting.setIdpCertFingerprint(idpCertFingerprint);
+		}
+
+		String idpCertFingerprintAlgorithm = loadStringProperty(CERTFINGERPRINT_ALGORITHM_PROPERTY_KEY, idpMap);
+		if (idpCertFingerprintAlgorithm != null && !idpCertFingerprintAlgorithm.isEmpty()) {
+			saml2Setting.setIdpCertFingerprintAlgorithm(idpCertFingerprintAlgorithm);
+		}
+	}
+
+
+	/**
+	 * Loads the IdP settings from the properties file
+	 */
 	private void loadIdpSetting() {
 		String idpEntityID = loadStringProperty(IDP_ENTITYID_PROPERTY_KEY);
 		if (idpEntityID != null) {
@@ -928,14 +984,14 @@ public class SettingsBuilder {
 	 *
 	 * @return the value
 	 */
-	private String loadStringProperty(String propertyKey, Map<String, Object> data) {
+	public String loadStringProperty(String propertyKey, Map<String, Object> data) {
 		Object propValue = data.get(propertyKey);
 		if (isString(propValue)) {
 			return StringUtils.trimToNull((String) propValue);
 		}
 		return null;
 	}
-	private Boolean loadBooleanProperty(String propertyKey) {
+	public Boolean loadBooleanProperty(String propertyKey) {
 		Object propValue = samlData.get(propertyKey);
 		return loadBooleanProperty(propertyKey, samlData);
 	}
@@ -948,7 +1004,7 @@ public class SettingsBuilder {
 	 *
 	 * @return the value
 	 */
-	private Boolean loadBooleanProperty(String propertyKey, Map<String, Object> data) {
+	public Boolean loadBooleanProperty(String propertyKey, Map<String, Object> data) {
 		Object propValue = data.get(propertyKey);
 		if (isString(propValue)) {
 			return Boolean.parseBoolean(((String) propValue).trim());
@@ -967,7 +1023,7 @@ public class SettingsBuilder {
 	 *
 	 * @return the value
 	 */
-	private List<String> loadListProperty(String propertyKey) {
+	public List<String> loadListProperty(String propertyKey) {
 		Object propValue = samlData.get(propertyKey);
 		if (isString(propValue)) {
 			String[] values = ((String) propValue).trim().split(",");
@@ -990,9 +1046,13 @@ public class SettingsBuilder {
 	 *
 	 * @return the value
 	 */
-	private URL loadURLProperty(String propertyKey) {
+	public URL loadURLProperty(String propertyKey) {
+		return loadURLProperty(propertyKey, this.samlData);
+	}
 
-		Object propValue = samlData.get(propertyKey);
+	static public URL loadURLProperty(String propertyKey, Map<String, Object> map) {
+
+		Object propValue = map.get(propertyKey);
 
 		if (isString(propValue)) {
 			try {
@@ -1010,7 +1070,7 @@ public class SettingsBuilder {
 		return null;
 	}
 
-	protected PrivateKey getPrivateKeyFromKeyStore(KeyStore keyStore, String alias, String password) {
+	public PrivateKey getPrivateKeyFromKeyStore(KeyStore keyStore, String alias, String password) {
 		Key key;
 		try {
 			if (keyStore.containsAlias(alias)) {
@@ -1027,7 +1087,7 @@ public class SettingsBuilder {
 		return null;
 	}
 
-	protected X509Certificate getCertificateFromKeyStore(KeyStore keyStore, String alias, String password) {
+	public X509Certificate getCertificateFromKeyStore(KeyStore keyStore, String alias, String password) {
 		try {
 			if (keyStore.containsAlias(alias)) {
 				Key key = keyStore.getKey(alias, password.toCharArray());
@@ -1053,7 +1113,7 @@ public class SettingsBuilder {
 	 *
 	 * @return the X509Certificate object
 	 */
-	protected X509Certificate loadCertificateFromProp(Object propValue) {
+	public X509Certificate loadCertificateFromProp(Object propValue) {
 
 		if (isString(propValue)) {
 			try {
@@ -1078,8 +1138,29 @@ public class SettingsBuilder {
 	 *
 	 * @return the X509Certificate object
 	 */
-	protected X509Certificate loadCertificateFromProp(String propertyKey) {
+	public X509Certificate loadCertificateFromProp(String propertyKey) {
 		return loadCertificateFromProp(samlData.get(propertyKey));
+	}
+
+	public X509Certificate loadCertificateFromPropMap(String propertyKey, Map<String, Object> map) {
+		return loadCertificateFromProp(map.get(propertyKey));
+	}
+
+
+	public List<X509Certificate> loadCertificateListFromProp(String propertyKey, Map<String, Object> map) {
+		List<X509Certificate> list = new ArrayList<X509Certificate>();
+
+		int i = 0;
+		while (true) {
+			Object propValue = map.get(propertyKey + "." + i++);
+
+			if (propValue == null)
+				break;
+
+			list.add(loadCertificateFromProp(propValue));
+		}
+
+		return list;
 	}
 
 	/**
@@ -1090,7 +1171,7 @@ public class SettingsBuilder {
 	 *
 	 * @return the X509Certificate object list
 	 */
-	private List<X509Certificate> loadCertificateListFromProp(String propertyKey) {
+	public List<X509Certificate> loadCertificateListFromProp(String propertyKey) {
 		List<X509Certificate> list = new ArrayList<X509Certificate>();
 
 		int i = 0;
@@ -1114,7 +1195,7 @@ public class SettingsBuilder {
 	 * @return the X509Certificate object
 	 */
 
-	protected X509Certificate loadCertificateFromFile(String filename) throws Exception {
+	public X509Certificate loadCertificateFromFile(String filename) throws Exception {
 			String certString = loadFFile(filename);
 			return Util.loadCert(certString);
 	}
@@ -1197,7 +1278,7 @@ public class SettingsBuilder {
 	 *
 	 * @param propValue the Object to be verified
 	 */
-	private boolean isString(Object propValue) {
+	static private boolean isString(Object propValue) {
 		return propValue instanceof String && StringUtils.isNotBlank((String) propValue);
 	}
 }
