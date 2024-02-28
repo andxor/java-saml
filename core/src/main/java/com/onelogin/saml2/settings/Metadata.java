@@ -13,6 +13,7 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.security.PrivateKey;
 
+import com.onelogin.saml2.model.*;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.text.StrSubstitutor;
 import org.apache.xml.security.exceptions.XMLSecurityException;
@@ -20,10 +21,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
-import com.onelogin.saml2.model.Contact;
-import com.onelogin.saml2.model.Organization;
-import com.onelogin.saml2.model.AttributeConsumingService;
-import com.onelogin.saml2.model.RequestedAttribute;
 import com.onelogin.saml2.util.Constants;
 import com.onelogin.saml2.util.Util;
 
@@ -42,10 +39,13 @@ public class Metadata {
 	private static final int N_DAYS_VALID_UNTIL = 2;
 	private static final int SECONDS_CACHED = 604800; // 1 week
 
-	/**
-     * AttributeConsumingService
-     */
+	 /* AttributeConsumingService
+	 *
+	 * @deprecated Attribute Consuming Services should be specified in settings
+	 */
+	@Deprecated
 	private AttributeConsumingService attributeConsumingService = null;
+
 
 	/**
 	 * Generated metadata in string format
@@ -169,7 +169,12 @@ public class Metadata {
 		valueMap.put("spAssertionConsumerServiceUrl", Util.toXml(settings.getSpAssertionConsumerServiceUrl().toString()));
 		valueMap.put("sls", toSLSXml(settings.getSpSingleLogoutServiceUrl(), settings.getSpSingleLogoutServiceBinding()));
 
-		valueMap.put("strAttributeConsumingService", getAttributeConsumingServiceXml());
+		// if an Attribute Consuming Service was specified at construction time, use it in place of the ones specified in settings
+		// this is for backward compatibility
+		valueMap.put("strAttributeConsumingService",
+				toAttributeConsumingServicesXml(attributeConsumingService != null
+						? Arrays.asList(attributeConsumingService)
+						: settings.getSpAttributeConsumingServices()));
 
 		valueMap.put("strKeyDescriptor", toX509KeyDescriptorsXML(settings.getSPcert(), settings.getSPcertNew(), wantsEncrypted));
 
@@ -187,6 +192,7 @@ public class Metadata {
 		StringBuilder template = new StringBuilder();
 		template.append("<?xml version=\"1.0\"?>");
 		template.append("<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"");
+		template.append(" xmlns:spid=\"https://spid.gov.it/saml-extensions\"");
 		template.append("${validUntilTimeStr}");
 		template.append("${cacheDurationStr}");
 		template.append(" entityID=\"${spEntityId}\"");
@@ -196,7 +202,8 @@ public class Metadata {
 		template.append("${sls}<md:NameIDFormat>${spNameIDFormat}</md:NameIDFormat>");
 		template.append("<md:AssertionConsumerService Binding=\"${spAssertionConsumerServiceBinding}\"");
 		template.append(" Location=\"${spAssertionConsumerServiceUrl}\"");
-		template.append(" index=\"1\"/>");
+		template.append(" isDefault=\"true\"");
+		template.append(" index=\"0\"/>");
 		template.append("${strAttributeConsumingService}");
 		template.append("</md:SPSSODescriptor>${strOrganization}${strContacts}");
 		template.append("</md:EntityDescriptor>");
@@ -204,66 +211,125 @@ public class Metadata {
 		return template;
 	}
 
+
+	private String toAttributeConsumingServicesXml(List<AttributeConsumingService> attributeConsumingServices) {
+		final StringBuilder acssXml = new StringBuilder();
+		if (attributeConsumingServices != null)
+			attributeConsumingServices.stream().forEach(service -> acssXml.append(toAttributeConsumingServiceXml(service)));
+		return acssXml.toString();
+	}
+
+
 	/**
-	 * Generates the AttributeConsumingService section of the metadata's template
+	 * Generates a single Attribute Consuming Service metadata fragment
 	 *
-	 * @return the AttributeConsumingService section of the metadata's template
+	 * @param service
+	 *              the Attribute Consuming Service for which the XML fragment
+	 *              should be generated
+	 * @return the generated XML fragment
 	 */
-	private String getAttributeConsumingServiceXml() {
+
+	private String toAttributeConsumingServiceXml(AttributeConsumingService service) {
+		int index = service.getIndex();
+		Boolean isDefault = service.isDefault();
+		String serviceName = service.getServiceName();
+		String serviceDescription = service.getServiceDescription();
+		String lang = service.getLang();
+		List<RequestedAttribute> requestedAttributes = service.getRequestedAttributes();
 		StringBuilder attributeConsumingServiceXML = new StringBuilder();
-		if (attributeConsumingService != null) {
-			String serviceName = attributeConsumingService.getServiceName();
-			String serviceDescription = attributeConsumingService.getServiceDescription();
-			List<RequestedAttribute> requestedAttributes = attributeConsumingService.getRequestedAttributes();
+		attributeConsumingServiceXML.append("<md:AttributeConsumingService index=\"").append(index).append("\"");
+		if(isDefault != null)
+			attributeConsumingServiceXML.append(" isDefault=\"").append(isDefault).append("\"");
+		attributeConsumingServiceXML.append(">");
+		if (serviceName != null && !serviceName.isEmpty()) {
+			attributeConsumingServiceXML.append("<md:ServiceName xml:lang=\"").append(Util.toXml(lang)).append("\">")
+					.append(Util.toXml(serviceName)).append("</md:ServiceName>");
+		}
+		if (serviceDescription != null && !serviceDescription.isEmpty()) {
+			attributeConsumingServiceXML.append("<md:ServiceDescription xml:lang=\"").append(Util.toXml(lang)).append("\">")
+					.append(Util.toXml(serviceDescription)).append("</md:ServiceDescription>");
+		}
+		if (requestedAttributes != null && !requestedAttributes.isEmpty()) {
+			for (RequestedAttribute requestedAttribute : requestedAttributes) {
+				String name = requestedAttribute.getName();
+				String friendlyName = requestedAttribute.getFriendlyName();
+				String nameFormat = requestedAttribute.getNameFormat();
+				Boolean isRequired = requestedAttribute.isRequired();
+				List<String> attrValues = requestedAttribute.getAttributeValues();
 
-			attributeConsumingServiceXML.append("<md:AttributeConsumingService index=\"1\">");
-			if (serviceName != null && !serviceName.isEmpty()) {
-				attributeConsumingServiceXML.append("<md:ServiceName xml:lang=\"en\">" + Util.toXml(serviceName) + "</md:ServiceName>");
-			}
-			if (serviceDescription != null && !serviceDescription.isEmpty()) {
-				attributeConsumingServiceXML.append("<md:ServiceDescription xml:lang=\"en\">" + Util.toXml(serviceDescription) + "</md:ServiceDescription>");
-			}
-			if (requestedAttributes != null && !requestedAttributes.isEmpty()) {
-				for (RequestedAttribute requestedAttribute : requestedAttributes) {
-					String name = requestedAttribute.getName();
-					String friendlyName = requestedAttribute.getFriendlyName();
-					String nameFormat = requestedAttribute.getNameFormat();
-					Boolean isRequired = requestedAttribute.isRequired();
-					List<String> attrValues = requestedAttribute.getAttributeValues();
+				StringBuilder contentStr = new StringBuilder("<md:RequestedAttribute");
 
-					String contentStr = "<md:RequestedAttribute";
+				if (name != null && !name.isEmpty()) {
+					contentStr.append(" Name=\"").append(Util.toXml(name)).append("\"");
+				}
 
-					if (name != null && !name.isEmpty()) {
-						contentStr += " Name=\"" + Util.toXml(name) + "\"";
+				if (nameFormat != null && !nameFormat.isEmpty()) {
+					contentStr.append(" NameFormat=\"").append(Util.toXml(nameFormat)).append("\"");
+				}
+
+				if (friendlyName != null && !friendlyName.isEmpty()) {
+					contentStr.append(" FriendlyName=\"").append(Util.toXml(friendlyName)).append("\"");
+				}
+
+				if (isRequired != null) {
+					contentStr.append(" isRequired=\"").append(isRequired.toString()).append("\"");
+				}
+
+				if (attrValues != null && !attrValues.isEmpty()) {
+					contentStr.append(">");
+					for (String attrValue : attrValues) {
+						contentStr.append("<saml:AttributeValue xmlns:saml=\"urn:oasis:names:tc:SAML:2.0:assertion\">").append(Util.toXml(attrValue)).append("</saml:AttributeValue>");
 					}
-
-					if (nameFormat != null && !nameFormat.isEmpty()) {
-						contentStr += " NameFormat=\"" + Util.toXml(nameFormat) + "\"";
-					}
-
-					if (friendlyName != null && !friendlyName.isEmpty()) {
-						contentStr += " FriendlyName=\"" + Util.toXml(friendlyName) + "\"";
-					}
-
-					if (isRequired != null) {
-						contentStr += " isRequired=\"" + isRequired.toString() + "\"";
-					}
-
-					if (attrValues != null && !attrValues.isEmpty()) {
-						contentStr += ">";
-						for (String attrValue : attrValues) {
-							contentStr += "<saml:AttributeValue xmlns:saml=\"urn:oasis:names:tc:SAML:2.0:assertion\">" + Util.toXml(attrValue) + "</saml:AttributeValue>";
-						}
-						attributeConsumingServiceXML.append(contentStr + "</md:RequestedAttribute>");
-					} else {
-						attributeConsumingServiceXML.append(contentStr + " />");
-					}
+					attributeConsumingServiceXML.append(contentStr).append("</md:RequestedAttribute>");
+				} else {
+					attributeConsumingServiceXML.append(contentStr).append(" />");
 				}
 			}
-			attributeConsumingServiceXML.append("</md:AttributeConsumingService>");
 		}
-
+		attributeConsumingServiceXML.append("</md:AttributeConsumingService>");
 		return attributeConsumingServiceXML.toString();
+	}
+
+
+	private String getContactExtension(Contact contact) {
+		StringBuilder stringBuilder = new StringBuilder();
+		switch (contact.getContactType()) {
+			case "other": {
+				stringBuilder.append("<md:Extensions>");
+				if(contact.getPivaAggregatore() != null) stringBuilder.append("<spid:VATNumber>").append(Util.toXml(contact.getPivaAggregatore())).append("</spid:VATNumber>");
+				if(contact.getFiscalCode() != null)	stringBuilder.append("<spid:FiscalCode>").append(Util.toXml(contact.getFiscalCode())).append("</spid:FiscalCode>");
+				contact.getTags().forEach(stringBuilder::append);
+				stringBuilder.append("</md:Extensions>");
+			}
+			case "billing":  {
+				CessionarioCommittente committente = contact.getCessionarioCommittente();
+				if (committente != null) {
+					stringBuilder
+							.append("<md:Extensions xmlns:fpa=\"https://spid.gov.it/invoicing-extensions\">")
+							.append("<fpa:CessionarioCommittente>")
+							.append("<fpa:DatiAnagrafici>")
+							.append("<fpa:IdFiscaleIVA>")
+							.append("<fpa:IdPaese>").append(committente.getCmIDCountry()).append("</fpa:IdPaese>")
+							.append("<fpa:IdCodice>").append(committente.getCmIDCode()).append("</fpa:IdCodice>")
+							.append("</fpa:IdFiscaleIVA>")
+							.append("<fpa:Anagrafica>")
+							.append("<fpa:Denominazione>").append(committente.getCmIDDenomination()).append("</fpa:Denominazione>")
+							.append("</fpa:Anagrafica>")
+							.append("</fpa:DatiAnagrafici>")
+							.append("<fpa:Sede>")
+							.append("<fpa:Indirizzo>").append(committente.getHqAddress()).append("</fpa:Indirizzo>")
+							.append("<fpa:NumeroCivico>").append(committente.getHqAddressNumber()).append("</fpa:NumeroCivico>")
+							.append("<fpa:CAP>").append(committente.getHqPostalCode()).append("</fpa:CAP>")
+							.append("<fpa:Comune>").append(committente.getHqCity()).append("</fpa:Comune>")
+							.append("<fpa:Provincia>").append(committente.getHqCounty()).append("</fpa:Provincia>")
+							.append("<fpa:Nazione>").append(committente.getCmIDCountry()).append("</fpa:Nazione>")
+							.append("</fpa:Sede>")
+							.append("</fpa:CessionarioCommittente>")
+							.append("</md:Extensions>");
+				}
+			}
+		}
+		return stringBuilder.toString();
 	}
 
 	/**
@@ -276,7 +342,12 @@ public class Metadata {
 		StringBuilder contactsXml = new StringBuilder();
 
 		for (Contact contact : contacts) {
-			contactsXml.append("<md:ContactPerson contactType=\"" + Util.toXml(contact.getContactType()) + "\">");
+			contactsXml.append("<md:ContactPerson contactType=\"").append(Util.toXml(contact.getContactType()));
+			if (contact.getSpidEntityType() != null) {
+				contactsXml.append("\" spid:entityType=\"spid:").append(contact.getSpidEntityType());
+			}
+			contactsXml.append("\">");
+			contactsXml.append(getContactExtension(contact));
 			final String company = contact.getCompany();
 			if(company != null)
 				contactsXml.append("<md:Company>" + Util.toXml(company) + "</md:Company>");

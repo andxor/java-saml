@@ -1,7 +1,10 @@
 package com.onelogin.saml2.settings;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -18,6 +21,7 @@ import org.xml.sax.InputSource;
 import com.onelogin.saml2.exception.Error;
 import com.onelogin.saml2.util.Constants;
 import com.onelogin.saml2.util.Util;
+import reactor.netty.internal.util.MapUtils;
 
 /**
  * IdPMetadataParser class of Java Toolkit.
@@ -193,18 +197,30 @@ public class IdPMetadataParser {
 	 * @throws Exception
 	 */
 	public static Map<String, Object> parseFileXML(String xmlFileName, String entityId, String desiredNameIdFormat, String desiredSSOBinding, String desiredSLOBinding) throws Exception {
-		ClassLoader classLoader = IdPMetadataParser.class.getClassLoader();
-		try (InputStream inputStream = classLoader.getResourceAsStream(xmlFileName)) {
-			if (inputStream != null) {
+
+		if (xmlFileName.startsWith("/")) {
+			try (InputStream inputStream = Files.newInputStream(Paths.get(xmlFileName))) {
 				Document xmlDocument = Util.parseXML(new InputSource(inputStream));
 				return parseXML(xmlDocument, entityId, desiredNameIdFormat, desiredSSOBinding, desiredSLOBinding);
-			} else {
-				throw new Exception("XML file '" + xmlFileName + "' not found in the classpath");
+			} catch (IOException e) {
+				String errorMsg = "XML	 file'" + xmlFileName + "' not found";
+				LOGGER.error(errorMsg, e);
+				throw new Error(errorMsg, Error.SETTINGS_FILE_NOT_FOUND);
 			}
-		} catch (Exception e) {
-			String errorMsg = "XML file'" + xmlFileName + "' cannot be loaded." + e.getMessage();
-			LOGGER.error(errorMsg, e);
-			throw new Error(errorMsg, Error.SETTINGS_FILE_NOT_FOUND);
+		} else {
+			ClassLoader classLoader = IdPMetadataParser.class.getClassLoader();
+			try (InputStream inputStream = classLoader.getResourceAsStream(xmlFileName)) {
+				if (inputStream != null) {
+					Document xmlDocument = Util.parseXML(new InputSource(inputStream));
+					return parseXML(xmlDocument, entityId, desiredNameIdFormat, desiredSSOBinding, desiredSLOBinding);
+				} else {
+					throw new Exception("XML file '" + xmlFileName + "' not found in the classpath");
+				}
+			} catch (Exception e) {
+				String errorMsg = "XML file'" + xmlFileName + "' cannot be loaded." + e.getMessage();
+				LOGGER.error(errorMsg, e);
+				throw new Error(errorMsg, Error.SETTINGS_FILE_NOT_FOUND);
+			}
 		}
 	}
 
@@ -296,8 +312,10 @@ public class IdPMetadataParser {
 	 *
 	 * @return the Saml2Settings object with metadata info settings loaded
 	 */
-	public static Saml2Settings injectIntoSettings(Saml2Settings settings, Map<String, Object> metadataInfo) {
-
+	public static Saml2Settings injectIntoSettings(Saml2Settings settings, Map<String, Object> metadataInfo) throws Exception {
+		if (metadataInfo == null || metadataInfo.isEmpty()) {
+			return settings;
+		}
 		SettingsBuilder settingsBuilder = new SettingsBuilder().fromValues(metadataInfo);
 		settingsBuilder.build(settings);
 		return settings;

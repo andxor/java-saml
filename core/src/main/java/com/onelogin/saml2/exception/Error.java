@@ -12,7 +12,7 @@ public class Error extends SAMLException {
 	public static final int SAML_LOGOUTRESPONSE_INVALID = 6;
 	public static final int SAML_SINGLE_LOGOUT_NOT_SUPPORTED = 7;
 
-    private int errorCode;
+    private final int errorCode;
 
 	public Error(String message, int errorCode) {
 		super(message);

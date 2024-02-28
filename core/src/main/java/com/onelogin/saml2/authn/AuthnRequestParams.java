@@ -27,8 +27,16 @@ public class AuthnRequestParams {
 	 */
 	private final String nameIdValueReq;
 
+	/*
+	 * / Selector to use to specify the Attribute Consuming Service index
+	 */
+	private AttributeConsumingServiceSelector attributeConsumingServiceSelector;
+
 	/**
-	 * Create a set of authentication request input parameters.
+	 * * Create a set of authentication request input parameters. The
+	 * 	 * {@link AttributeConsumingServiceSelector#useDefault()} selector is used to
+	 * 	 * select the Attribute Consuming Service.
+	 *
 	 *
 	 * @param forceAuthn
 	 *              whether the <code>ForceAuthn</code> attribute should be set to
@@ -41,6 +49,13 @@ public class AuthnRequestParams {
 	 */
 	public AuthnRequestParams(boolean forceAuthn, boolean isPassive, boolean setNameIdPolicy) {
 		this(forceAuthn, isPassive, setNameIdPolicy, true);
+	}
+
+
+
+	public AuthnRequestParams(boolean forceAuthn, boolean isPassive, boolean setNameIdPolicy,
+							  AttributeConsumingServiceSelector attributeConsumingServiceSelector) {
+		this(forceAuthn, isPassive, setNameIdPolicy, true, null, attributeConsumingServiceSelector);
 	}
 
 	/**
@@ -82,6 +97,14 @@ public class AuthnRequestParams {
 		this(forceAuthn, isPassive, setNameIdPolicy, true, nameIdValueReq);
 	}
 
+
+	public AuthnRequestParams(boolean forceAuthn, boolean isPassive, boolean setNameIdPolicy, boolean allowCreate,
+							  String nameIdValueReq) {
+		this(forceAuthn, isPassive, setNameIdPolicy, allowCreate, nameIdValueReq, null);
+	}
+
+
+
 	/**
 	 * Create a set of authentication request input parameters.
 	 *
@@ -102,12 +125,15 @@ public class AuthnRequestParams {
 	 *              the subject that should be authenticated
 	 */
 	public AuthnRequestParams(boolean forceAuthn, boolean isPassive, boolean setNameIdPolicy, boolean allowCreate,
-	            String nameIdValueReq) {
+	            String nameIdValueReq, AttributeConsumingServiceSelector attributeConsumingServiceSelector) {
 		this.forceAuthn = forceAuthn;
 		this.isPassive = isPassive;
 		this.setNameIdPolicy = setNameIdPolicy;
 		this.allowCreate = allowCreate;
 		this.nameIdValueReq = nameIdValueReq;
+		this.attributeConsumingServiceSelector =  attributeConsumingServiceSelector != null
+				? attributeConsumingServiceSelector
+				: AttributeConsumingServiceSelector.useDefault();
 	}
 
 	/**
@@ -123,6 +149,7 @@ public class AuthnRequestParams {
 		this.setNameIdPolicy = source.isSetNameIdPolicy();
 		this.allowCreate = source.isAllowCreate();
 		this.nameIdValueReq = source.getNameIdValueReq();
+		this.attributeConsumingServiceSelector = source.getAttributeConsumingServiceSelector();
 	}
 
 	/**
@@ -162,5 +189,9 @@ public class AuthnRequestParams {
 	 */
 	public String getNameIdValueReq() {
 		return nameIdValueReq;
+	}
+
+	public AttributeConsumingServiceSelector getAttributeConsumingServiceSelector() {
+		return attributeConsumingServiceSelector;
 	}
 }

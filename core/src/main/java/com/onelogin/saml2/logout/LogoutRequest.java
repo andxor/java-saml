@@ -67,7 +67,7 @@ public class LogoutRequest {
 	/**
 	 * Time when the Logout Request was created
 	 */
-	private Calendar issueInstant;
+	private final Calendar issueInstant;
 
 	/**
 	 * After validation, if it fails this property has the cause of the problem

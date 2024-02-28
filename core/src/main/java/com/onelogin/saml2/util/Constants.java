@@ -90,6 +90,7 @@ public final class Constants {
 	public static final String CONTACT_TYPE_BILLING = "billing";
 	public static final String CONTACT_TYPE_OTHER = "other";
 
+
 	// Canonization
 	public static final String C14N = "http://www.w3.org/TR/2001/REC-xml-c14n-20010315";
 	public static final String C14N_WC = "http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments";

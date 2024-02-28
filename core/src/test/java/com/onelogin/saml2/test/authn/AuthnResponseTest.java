@@ -81,7 +81,7 @@ public class AuthnResponseTest {
 	 * @see com.onelogin.saml2.authn.SamlResponse
 	 */
 	@Test
-	public void testDeconstructedConstructor() throws IOException, Error, XPathExpressionException, ParserConfigurationException, SAXException, SettingsException, ValidationError {
+	public void testDeconstructedConstructor() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.my.properties").build();
 
 		final String requestURL = "/";
@@ -110,7 +110,7 @@ public class AuthnResponseTest {
 	 * @see com.onelogin.saml2.authn.SamlResponse
 	 */
 	@Test
-	public void testConstructor() throws IOException, Error, XPathExpressionException, ParserConfigurationException, SAXException, SettingsException, ValidationError {
+	public void testConstructor() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.my.properties").build();
 
 		final String requestURL = "/";
@@ -156,7 +156,7 @@ public class AuthnResponseTest {
 	 * @see com.onelogin.saml2.authn.SamlResponse#getNameId
 	 */
 	@Test
-	public void testEncryptedAssertionNokey() throws IOException, Error, XPathExpressionException, ParserConfigurationException, SAXException, SettingsException, ValidationError {
+	public void testEncryptedAssertionNokey() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.min.properties").build();
 		String samlResponseEncoded = Util.getFileAsString("data/responses/valid_encrypted_assertion.xml.base64");
 		
@@ -191,7 +191,7 @@ public class AuthnResponseTest {
 	 * @see com.onelogin.saml2.authn.SamlResponse
 	 */
 	@Test
-	public void testNamespaces() throws IOException, Error, XPathExpressionException, ParserConfigurationException, SAXException, SettingsException, ValidationError {
+	public void testNamespaces() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.my.properties").build();
 		String samlResponseEncoded = Util.getFileAsString("data/responses/open_saml_response.xml.base64");
 		SamlResponse samlResponse = new SamlResponse(settings, newHttpRequest(samlResponseEncoded));
@@ -226,7 +226,7 @@ public class AuthnResponseTest {
 	 * @see com.onelogin.saml2.authn.SamlResponse#getSAMLResponseXml
 	 */
 	@Test
-	public void testGetSAMLResponseXml() throws IOException, Error, XPathExpressionException, ParserConfigurationException, SAXException, SettingsException, ValidationError {
+	public void testGetSAMLResponseXml() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.my.properties").build();
 
 		final String requestURL = "/";
@@ -642,7 +642,7 @@ public class AuthnResponseTest {
 	 * @see com.onelogin.saml2.authn.SamlResponse#checkOneCondition
 	 */
 	@Test
-	public void checkOneCondition() throws IOException, Error, XPathExpressionException, ParserConfigurationException, SAXException, SettingsException, ValidationError {
+	public void checkOneCondition() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.my.properties").build();
 
 		String samlResponseEncoded = Util.getFileAsString("data/responses/invalids/no_conditions.xml.base64");
@@ -668,7 +668,7 @@ public class AuthnResponseTest {
 	 * @see com.onelogin.saml2.authn.SamlResponse#checkOneAuthnStatement
 	 */
 	@Test
-	public void checkOneAuthNStatement() throws IOException, Error, XPathExpressionException, ParserConfigurationException, SAXException, SettingsException, ValidationError {
+	public void checkOneAuthNStatement() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.my.properties").build();
 
 		String samlResponseEncoded = Util.getFileAsString("data/responses/invalids/no_authnstatement.xml.base64");
@@ -695,7 +695,7 @@ public class AuthnResponseTest {
 	 * @see com.onelogin.saml2.authn.SamlResponse#checkStatus
 	 */
 	@Test
-	public void testCheckStatus() throws IOException, Error, XPathExpressionException, ParserConfigurationException, SAXException, SettingsException, ValidationError  {
+	public void testCheckStatus() throws Exception  {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.my.properties").build();
 		String samlResponseEncoded = Util.getFileAsString("data/responses/response1.xml.base64");
 		SamlResponse samlResponse = new SamlResponse(settings, newHttpRequest(samlResponseEncoded));
@@ -721,7 +721,7 @@ public class AuthnResponseTest {
 	 * @see com.onelogin.saml2.authn.SamlResponse#checkStatus
 	 */
 	@Test
-	public void testCheckStatusResponder() throws IOException, Error, XPathExpressionException, ParserConfigurationException, SAXException, SettingsException, ValidationError {
+	public void testCheckStatusResponder() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.my.properties").build();
 
 		String samlResponseEncoded = Util.getFileAsString("data/responses/invalids/status_code_responder.xml.base64");
@@ -747,7 +747,7 @@ public class AuthnResponseTest {
 	 * @see com.onelogin.saml2.authn.SamlResponse#checkStatus
 	 */
 	@Test
-	public void testCheckStatusResponderMsg() throws IOException, Error, XPathExpressionException, ParserConfigurationException, SAXException, SettingsException, ValidationError {
+	public void testCheckStatusResponderMsg() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.my.properties").build();
 
 		String samlResponseEncoded = Util.getFileAsString("data/responses/invalids/status_code_responder_and_msg.xml.base64");
@@ -773,7 +773,7 @@ public class AuthnResponseTest {
 	 * @see com.onelogin.saml2.authn.SamlResponse#checkStatus
 	 */
 	@Test
-	public void testCheckStatusNoStatus() throws IOException, Error, XPathExpressionException, ParserConfigurationException, SAXException, SettingsException, ValidationError {
+	public void testCheckStatusNoStatus() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.my.properties").build();
 
 		String samlResponseEncoded = Util.getFileAsString("data/responses/invalids/no_status.xml.base64");
@@ -799,7 +799,7 @@ public class AuthnResponseTest {
 	 * @see com.onelogin.saml2.authn.SamlResponse#checkStatus
 	 */
 	@Test
-	public void testCheckStatusNoStatusCode() throws IOException, Error, XPathExpressionException, ParserConfigurationException, SAXException, SettingsException, ValidationError {
+	public void testCheckStatusNoStatusCode() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.my.properties").build();
 
 		String samlResponseEncoded = Util.getFileAsString("data/responses/invalids/no_status_code.xml.base64");
@@ -824,7 +824,7 @@ public class AuthnResponseTest {
 	 * @see com.onelogin.saml2.authn.SamlResponse#getStatus
 	 */
 	@Test
-	public void testGetStatus() throws IOException, Error, XPathExpressionException, ParserConfigurationException, SAXException, SettingsException, ValidationError {
+	public void testGetStatus() throws Exception {
 		String samlResponseEncoded = Util.getFileAsString("data/responses/response1.xml.base64");
 		Document samlResponseDoc = Util.loadXML(new String(Util.base64decoder(samlResponseEncoded))); 
 		SamlResponseStatus status = SamlResponse.getStatus(samlResponseDoc);
@@ -871,7 +871,7 @@ public class AuthnResponseTest {
 	 * @see com.onelogin.saml2.authn.SamlResponse#getAudiences
 	 */
 	@Test
-	public void testGetAudiences() throws IOException, Error, XPathExpressionException, ParserConfigurationException, SAXException, SettingsException, ValidationError {
+	public void testGetAudiences() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.my.properties").build();
 
 		String samlResponseEncoded = Util.getFileAsString("data/responses/response1.xml.base64");
@@ -904,7 +904,7 @@ public class AuthnResponseTest {
 	 * @see com.onelogin.saml2.authn.SamlResponse#getIssuers
 	 */
 	@Test
-	public void testGetResponseIssuerTrimming() throws IOException, Error, XPathExpressionException, ParserConfigurationException, SAXException, SettingsException, ValidationError {
+	public void testGetResponseIssuerTrimming() throws Exception {
 		// disabled by now
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.my.properties").build();
 		String samlResponseEncoded = Util.getFileAsString("data/responses/response3_with_whitespace.xml.base64");
@@ -931,7 +931,7 @@ public class AuthnResponseTest {
 	 * @see com.onelogin.saml2.authn.SamlResponse#getIssuers
 	 */
 	@Test
-	public void testGetAssertionIssuerNoInAssertion() throws IOException, Error, XPathExpressionException, ParserConfigurationException, SAXException, SettingsException, ValidationError {
+	public void testGetAssertionIssuerNoInAssertion() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.my.properties").build();
 		String samlResponseEncoded = Util.getFileAsString("data/responses/invalids/no_issuer_assertion.xml.base64");
 		SamlResponse samlResponse = new SamlResponse(settings, newHttpRequest(samlResponseEncoded));
@@ -957,7 +957,7 @@ public class AuthnResponseTest {
 	 * @see com.onelogin.saml2.authn.SamlResponse#getIssuers
 	 */
 	@Test
-	public void testGetAssertionIssuerTrimming() throws IOException, Error, XPathExpressionException, ParserConfigurationException, SAXException, SettingsException, ValidationError {
+	public void testGetAssertionIssuerTrimming() throws Exception {
 		// disabled by now
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.my.properties").build();
 		String samlResponseEncoded = Util.getFileAsString("data/responses/response3_with_whitespace.xml.base64");
@@ -982,7 +982,7 @@ public class AuthnResponseTest {
 	 * @see com.onelogin.saml2.authn.SamlResponse#getIssuers
 	 */
 	@Test
-	public void testGetIssuers() throws IOException, Error, XPathExpressionException, ParserConfigurationException, SAXException, SettingsException, ValidationError {
+	public void testGetIssuers() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.my.properties").build();
 		String samlResponseEncoded = Util.getFileAsString("data/responses/valid_encrypted_assertion.xml.base64");
 		SamlResponse samlResponse = new SamlResponse(settings, newHttpRequest(samlResponseEncoded));
@@ -1053,7 +1053,7 @@ public class AuthnResponseTest {
 	 * @see com.onelogin.saml2.authn.SamlResponse#getIssuers
 	 */
 	@Test
-	public void testGetIssuersDifferentIssuers() throws IOException, Error, XPathExpressionException, ParserConfigurationException, SAXException, SettingsException, ValidationError {
+	public void testGetIssuersDifferentIssuers() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.my.properties").build();
 		String samlResponseEncoded = Util.getFileAsString("data/responses/invalids/different_issuers.xml.base64");
 		SamlResponse samlResponse = new SamlResponse(settings, newHttpRequest(samlResponseEncoded));
@@ -1082,7 +1082,7 @@ public class AuthnResponseTest {
 	 * @see com.onelogin.saml2.authn.SamlResponse#getIssuers
 	 */
 	@Test
-	public void testGetIssuersNoInAssertion() throws IOException, Error, XPathExpressionException, ParserConfigurationException, SAXException, SettingsException, ValidationError {
+	public void testGetIssuersNoInAssertion() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.my.properties").build();
 		String samlResponseEncoded = Util.getFileAsString("data/responses/invalids/no_issuer_assertion.xml.base64");
 		SamlResponse samlResponse = new SamlResponse(settings, newHttpRequest(samlResponseEncoded));
@@ -1109,7 +1109,7 @@ public class AuthnResponseTest {
 	 * @see com.onelogin.saml2.authn.SamlResponse#getIssuers
 	 */
 	@Test
-	public void testGetIssuersTrimming() throws IOException, Error, XPathExpressionException, ParserConfigurationException, SAXException, SettingsException, ValidationError {
+	public void testGetIssuersTrimming() throws Exception {
 		// disabled by now
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.my.properties").build();
 		String samlResponseEncoded = Util.getFileAsString("data/responses/response3_with_whitespace.xml.base64");
@@ -1117,7 +1117,7 @@ public class AuthnResponseTest {
 		assertEquals(Arrays.asList("\n  \thttp://example.com/services/trust\n  ", "\n    \thttp://example.com/services/trust\n    "), samlResponse.getIssuers());
 		settings.setTrimNameIds(true);
 		samlResponse = new SamlResponse(settings, newHttpRequest(samlResponseEncoded));
-		assertEquals(Arrays.asList("http://example.com/services/trust"), samlResponse.getIssuers());
+		assertEquals(List.of("http://example.com/services/trust"), samlResponse.getIssuers());
 	}
 
 	/**
@@ -1134,7 +1134,7 @@ public class AuthnResponseTest {
 	 * @see com.onelogin.saml2.authn.SamlResponse#getSessionIndex
 	 */
 	@Test
-	public void testGetSessionIndex() throws IOException, Error, XPathExpressionException, ParserConfigurationException, SAXException, SettingsException, ValidationError {
+	public void testGetSessionIndex() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.my.properties").build();
 		String samlResponseEncoded = Util.getFileAsString("data/responses/response1.xml.base64");
 		SamlResponse samlResponse = new SamlResponse(settings, newHttpRequest(samlResponseEncoded));
@@ -1146,7 +1146,7 @@ public class AuthnResponseTest {
 	}
 
 	@Test
-	public void testGetAssertionDetails() throws IOException, Error, XPathExpressionException, ParserConfigurationException, SAXException, SettingsException, ValidationError {
+	public void testGetAssertionDetails() throws Exception {
 		final SamlResponse samlResponse = new SamlResponse(
 				new SettingsBuilder().fromFile("config/config.my.properties").build(),
 				newHttpRequest(Util.getFileAsString("data/responses/response1.xml.base64"))
@@ -1159,7 +1159,7 @@ public class AuthnResponseTest {
 	}
 
 	@Test
-	public void testGetAssertionDetails_encrypted() throws IOException, Error, XPathExpressionException, ParserConfigurationException, SAXException, SettingsException, ValidationError {
+	public void testGetAssertionDetails_encrypted() throws Exception {
 		final SamlResponse samlResponse = new SamlResponse(
 				new SettingsBuilder().fromFile("config/config.my.properties").build(),
 				newHttpRequest(Util.getFileAsString("data/responses/valid_encrypted_assertion.xml.base64"))
@@ -1201,7 +1201,7 @@ public class AuthnResponseTest {
 	 * @see com.onelogin.saml2.authn.SamlResponse#getAttributes
 	 */
 	@Test
-	public void testGetAttributes() throws IOException, Error, XPathExpressionException, ParserConfigurationException, SAXException, SettingsException, ValidationError {
+	public void testGetAttributes() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.my.properties").build();
 		String samlResponseEncoded = Util.getFileAsString("data/responses/response1.xml.base64");
 		SamlResponse samlResponse = new SamlResponse(settings, newHttpRequest(samlResponseEncoded));
@@ -1240,7 +1240,7 @@ public class AuthnResponseTest {
 	 * @see com.onelogin.saml2.authn.SamlResponse#getAttributes
 	 */
 	@Test
-	public void testGetAttributesTrimming() throws IOException, Error, XPathExpressionException, ParserConfigurationException, SAXException, SettingsException, ValidationError {
+	public void testGetAttributesTrimming() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.min.properties").build();
 		String samlResponseEncoded = Util.getFileAsString("data/responses/response3_with_whitespace.xml.base64");
 		SamlResponse samlResponse = new SamlResponse(settings, newHttpRequest(samlResponseEncoded));
@@ -1274,7 +1274,7 @@ public class AuthnResponseTest {
 	 * @see com.onelogin.saml2.authn.SamlResponse#getAttributes
 	 */
 	@Test
-	public void testGetAttributesDuplicatedNames() throws IOException, Error, XPathExpressionException, ParserConfigurationException, SAXException, SettingsException, ValidationError {
+	public void testGetAttributesDuplicatedNames() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.my.properties").build();
 		String samlResponseEncoded = Util.getFileAsString("data/responses/invalids/duplicated_attributes.xml.base64");
 		SamlResponse samlResponse = new SamlResponse(settings, newHttpRequest(samlResponseEncoded));
@@ -1299,8 +1299,7 @@ public class AuthnResponseTest {
 	 * @see com.onelogin.saml2.authn.SamlResponse#getAttributes
 	 */
 	@Test
-	public void testGetAttributesAllowDuplicatedNames () throws IOException, Error, XPathExpressionException, ParserConfigurationException,
-				SAXException, SettingsException, ValidationError {
+	public void testGetAttributesAllowDuplicatedNames () throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.allowduplicatednames.properties").build();
 		String samlResponseEncoded = Util.getFileAsString("data/responses/invalids/duplicated_attributes.xml.base64");
 		SamlResponse samlResponse = new SamlResponse(settings, newHttpRequest(samlResponseEncoded));
@@ -1442,7 +1441,7 @@ public class AuthnResponseTest {
 	 * @see com.onelogin.saml2.authn.SamlResponse#getSessionNotOnOrAfter
 	 */
 	@Test
-	public void testGetSessionNotOnOrAfter() throws IOException, Error, XPathExpressionException, ParserConfigurationException, SAXException, SettingsException, ValidationError {
+	public void testGetSessionNotOnOrAfter() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.my.properties").build();
 		String samlResponseEncoded = Util.getFileAsString("data/responses/response1.xml.base64");
 		SamlResponse samlResponse = new SamlResponse(settings, newHttpRequest(samlResponseEncoded));
@@ -1471,7 +1470,7 @@ public class AuthnResponseTest {
 	 * @see com.onelogin.saml2.authn.SamlResponse#validateNumAssertions
 	 */
 	@Test
-	public void testValidateNumAssertions() throws IOException, Error, XPathExpressionException, ParserConfigurationException, SAXException, SettingsException, ValidationError {
+	public void testValidateNumAssertions() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.min.properties").build();
 		String samlResponseEncoded = Util.getFileAsString("data/responses/response1.xml.base64");
 		SamlResponse samlResponse = new SamlResponse(settings, newHttpRequest(samlResponseEncoded));
@@ -1496,7 +1495,7 @@ public class AuthnResponseTest {
 	 * @see com.onelogin.saml2.authn.SamlResponse#validateTimestamps
 	 */
 	@Test
-	public void testValidateTimestamps() throws ValidationError, IOException, XPathExpressionException, ParserConfigurationException, SAXException, SettingsException, Error {
+	public void testValidateTimestamps() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.my.properties").build();
 		String samlResponseEncoded = Util.getFileAsString("data/responses/valid_response.xml.base64");
 		SamlResponse samlResponse = new SamlResponse(settings, newHttpRequest(samlResponseEncoded));
@@ -1525,7 +1524,7 @@ public class AuthnResponseTest {
 	 * @see com.onelogin.saml2.authn.SamlResponse#validateTimestamps
 	 */
 	@Test 
-	public void testValidateTimestampsExpired() throws ValidationError, XPathExpressionException, ParserConfigurationException, SAXException, IOException, SettingsException, Error {
+	public void testValidateTimestampsExpired() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.my.properties").build();
 		String samlResponseEncoded = Util.getFileAsString("data/responses/expired_response.xml.base64");
 		SamlResponse samlResponse = new SamlResponse(settings, newHttpRequest(samlResponseEncoded));
@@ -1549,7 +1548,7 @@ public class AuthnResponseTest {
 	 * @see com.onelogin.saml2.authn.SamlResponse#validateTimestamps
 	 */
 	@Test
-	public void testValidateTimestampsNA() throws ValidationError, XPathExpressionException, ParserConfigurationException, SAXException, IOException, SettingsException, Error {
+	public void testValidateTimestampsNA() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.my.properties").build();
 		String samlResponseEncoded = Util.getFileAsString("data/responses/invalids/not_after_failed.xml.base64");
 		SamlResponse samlResponse = new SamlResponse(settings, newHttpRequest(samlResponseEncoded));
@@ -1573,7 +1572,7 @@ public class AuthnResponseTest {
 	 * @see com.onelogin.saml2.authn.SamlResponse#validateTimestamps
 	 */
 	@Test
-	public void testValidateTimestampsNB() throws ValidationError, XPathExpressionException, ParserConfigurationException, SAXException, IOException, SettingsException, Error {
+	public void testValidateTimestampsNB() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.my.properties").build();
 		String samlResponseEncoded = Util.getFileAsString("data/responses/invalids/not_before_failed.xml.base64");
 		SamlResponse samlResponse = new SamlResponse(settings, newHttpRequest(samlResponseEncoded));
@@ -1598,7 +1597,7 @@ public class AuthnResponseTest {
 	 * @see com.onelogin.saml2.authn.SamlResponse#isValid
 	 */
 	@Test
-	public void testNullRequest() throws IOException, Error, XPathExpressionException, ParserConfigurationException, SAXException, SettingsException, ValidationError {
+	public void testNullRequest() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.min.properties").build();
 		expectedEx.expect(NullPointerException.class);
 		SamlResponse samlResponse = new SamlResponse(settings, null);
@@ -1619,7 +1618,7 @@ public class AuthnResponseTest {
 	 * @see com.onelogin.saml2.authn.SamlResponse#isValid
 	 */
 	@Test
-	public void testNoCurrentURL() throws IOException, Error, XPathExpressionException, ParserConfigurationException, SAXException, SettingsException, ValidationError {
+	public void testNoCurrentURL() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.min.properties").build();
 		final String requestURL = "";
 		String samlResponseEncoded = Util.getFileAsString("data/responses/valid_response.xml.base64");
@@ -1647,7 +1646,7 @@ public class AuthnResponseTest {
 	 * @see com.onelogin.saml2.authn.SamlResponse#isValid
 	 */
 	@Test
-	public void testValidateVersion() throws IOException, Error, XPathExpressionException, ParserConfigurationException, SAXException, SettingsException, ValidationError {
+	public void testValidateVersion() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.min.properties").build();
 		String samlResponseEncoded = Util.getFileAsString("data/responses/invalids/no_saml2.xml.base64");
 		SamlResponse samlResponse = new SamlResponse(settings, newHttpRequest(samlResponseEncoded));
@@ -1670,7 +1669,7 @@ public class AuthnResponseTest {
 	 * @see com.onelogin.saml2.authn.SamlResponse#isValid
 	 */
 	@Test
-	public void testValidateResponseVersion() throws IOException, Error, XPathExpressionException, ParserConfigurationException, SAXException, SettingsException, ValidationError {
+	public void testValidateResponseVersion() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.min.properties").build();
 		String samlResponseEncoded = Util.getFileAsString("data/responses/invalids/invalid_response_version.xml.base64");
 		SamlResponse samlResponse = new SamlResponse(settings, newHttpRequest(samlResponseEncoded));
@@ -1693,7 +1692,7 @@ public class AuthnResponseTest {
 	 * @see com.onelogin.saml2.authn.SamlResponse#isValid
 	 */
 	@Test
-	public void testValidateAssertionVersion() throws IOException, Error, XPathExpressionException, ParserConfigurationException, SAXException, SettingsException, ValidationError {
+	public void testValidateAssertionVersion() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.min.properties").build();
 		String samlResponseEncoded = Util.getFileAsString("data/responses/invalids/invalid_assertion_version.xml.base64");
 		SamlResponse samlResponse = new SamlResponse(settings, newHttpRequest(samlResponseEncoded));
@@ -1716,7 +1715,7 @@ public class AuthnResponseTest {
 	 * @see com.onelogin.saml2.authn.SamlResponse#isValid
 	 */
 	@Test
-	public void testValidateID() throws IOException, Error, XPathExpressionException, ParserConfigurationException, SAXException, SettingsException, ValidationError {
+	public void testValidateID() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.min.properties").build();
 		String samlResponseEncoded = Util.getFileAsString("data/responses/invalids/no_id.xml.base64");
 		SamlResponse samlResponse = new SamlResponse(settings, newHttpRequest(samlResponseEncoded));
@@ -1739,7 +1738,7 @@ public class AuthnResponseTest {
 	 * @see com.onelogin.saml2.authn.SamlResponse#isValid
 	 */
 	@Test
-	public void testIsInValidExpired() throws IOException, Error, XPathExpressionException, ParserConfigurationException, SAXException, SettingsException, ValidationError {
+	public void testIsInValidExpired() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.my.properties").build();
 		String samlResponseEncoded = Util.getFileAsString("data/responses/expired_response.xml.base64");
 		settings.setStrict(false);
@@ -1767,7 +1766,7 @@ public class AuthnResponseTest {
 	 * @see com.onelogin.saml2.authn.SamlResponse#isValid
 	 */
 	@Test
-	public void testIsInValidNoKey() throws IOException, Error, XPathExpressionException, ParserConfigurationException, SAXException, SettingsException, ValidationError {
+	public void testIsInValidNoKey() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.min.properties").build();
 		String samlResponseEncoded = Util.getFileAsString("data/responses/invalids/no_key.xml.base64");
 		settings.setStrict(false);
@@ -1791,7 +1790,7 @@ public class AuthnResponseTest {
 	 * @see com.onelogin.saml2.authn.SamlResponse#isValid
 	 */
 	@Test
-	public void testIsInValidMultipleAssertions() throws IOException, Error, XPathExpressionException, ParserConfigurationException, SAXException, SettingsException, ValidationError {
+	public void testIsInValidMultipleAssertions() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.min.properties").build();
 		String samlResponseEncoded = Util.getFileAsString("data/responses/invalids/multiple_assertions.xml.base64");
 		SamlResponse samlResponse = new SamlResponse(settings, newHttpRequest(samlResponseEncoded));
@@ -1814,7 +1813,7 @@ public class AuthnResponseTest {
 	 * @see com.onelogin.saml2.authn.SamlResponse#isValid
 	 */
 	@Test
-	public void testIsInValidEncAttrs() throws IOException, Error, XPathExpressionException, ParserConfigurationException, SAXException, SettingsException, ValidationError {
+	public void testIsInValidEncAttrs() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.min.properties").build();
 		String samlResponseEncoded = Util.getFileAsString("data/responses/invalids/encrypted_attrs.xml.base64");
 		settings.setStrict(false);
@@ -1886,7 +1885,7 @@ public class AuthnResponseTest {
 	 * @see com.onelogin.saml2.authn.SamlResponse#isValid
 	 */
 	@Test
-	public void testIsInValidWrongXML() throws IOException, Error, XPathExpressionException, ParserConfigurationException, SAXException, SettingsException, ValidationError {
+	public void testIsInValidWrongXML() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.my.properties").build();
 		final String requestURL = "https://pitbulk.no-ip.org/newonelogin/demo1/index.php?acs";
 		String samlResponseEncoded = Util.getFileAsString("data/responses/invalids/invalid_xml.xml.base64");
@@ -1926,7 +1925,7 @@ public class AuthnResponseTest {
 	 * @see com.onelogin.saml2.authn.SamlResponse#isValid
 	 */
 	@Test
-	public void testIsInValidDestination() throws IOException, Error, XPathExpressionException, ParserConfigurationException, SAXException, SettingsException, ValidationError {
+	public void testIsInValidDestination() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.min.properties").build();
 		final String requestURL = "/";
 		String samlResponseEncoded = Util.getFileAsString("data/responses/unsigned_response.xml.base64");
@@ -1960,7 +1959,7 @@ public class AuthnResponseTest {
 	 * @see com.onelogin.saml2.authn.SamlResponse#isValid
 	 */
 	@Test
-	public void testIsInValidNoDestination() throws IOException, Error, XPathExpressionException, ParserConfigurationException, SAXException, SettingsException, ValidationError {
+	public void testIsInValidNoDestination() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.my.properties").build();
 		final String requestURL = "/";
 		String samlResponseEncoded = Util.getFileAsString("data/responses/invalids/empty_destination.xml.base64");
@@ -1989,7 +1988,7 @@ public class AuthnResponseTest {
 	 * @see com.onelogin.saml2.authn.SamlResponse#isValid
 	 */
 	@Test
-	public void testIsInValidConditions() throws IOException, Error, XPathExpressionException, ParserConfigurationException, SAXException, SettingsException, ValidationError {
+	public void testIsInValidConditions() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.my.properties").build();
 		String samlResponseEncoded = Util.getFileAsString("data/responses/invalids/no_conditions.xml.base64");
 
@@ -2013,7 +2012,7 @@ public class AuthnResponseTest {
 	 * @see com.onelogin.saml2.authn.SamlResponse#isValid
 	 */
 	@Test
-	public void testIsInValidAuthStatement() throws IOException, Error, XPathExpressionException, ParserConfigurationException, SAXException, SettingsException, ValidationError {
+	public void testIsInValidAuthStatement() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.my.properties").build();
 		String samlResponseEncoded = Util.getFileAsString("data/responses/invalids/no_authnstatement.xml.base64");
 
@@ -2037,7 +2036,7 @@ public class AuthnResponseTest {
 	 * @see com.onelogin.saml2.authn.SamlResponse#isValid
 	 */
 	@Test
-	public void testIsInValidAudience() throws IOException, Error, XPathExpressionException, ParserConfigurationException, SAXException, SettingsException, ValidationError {
+	public void testIsInValidAudience() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.min.properties").build();
 		String samlResponseEncoded = Util.getFileAsString("data/responses/invalids/invalid_audience.xml.base64");
 		settings.setStrict(false);
@@ -2066,7 +2065,7 @@ public class AuthnResponseTest {
 	 * @see com.onelogin.saml2.authn.SamlResponse#isValid
 	 */
 	@Test
-	public void testIsInValidIssuer() throws IOException, Error, XPathExpressionException, ParserConfigurationException, SAXException, SettingsException, ValidationError {
+	public void testIsInValidIssuer() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.min.properties").build();
 		String samlResponseEncoded = Util.getFileAsString("data/responses/invalids/invalid_issuer_assertion.xml.base64");
 		settings.setStrict(false);
@@ -2106,7 +2105,7 @@ public class AuthnResponseTest {
 	 * @see com.onelogin.saml2.authn.SamlResponse#isValid
 	 */
 	@Test
-	public void testIsInValidSessionIndex() throws IOException, Error, XPathExpressionException, ParserConfigurationException, SAXException, SettingsException, ValidationError {
+	public void testIsInValidSessionIndex() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.min.properties").build();
 		String samlResponseEncoded = Util.getFileAsString("data/responses/invalids/invalid_sessionindex.xml.base64");
 		settings.setStrict(false);
@@ -2282,7 +2281,7 @@ public class AuthnResponseTest {
 	 * @see com.onelogin.saml2.authn.SamlResponse#isValid
 	 */
 	@Test
-	public void testDatetimeWithMiliseconds() throws IOException, Error, XPathExpressionException, ParserConfigurationException, SAXException, SettingsException, ValidationError {
+	public void testDatetimeWithMiliseconds() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.min.properties").build();
 		String samlResponseEncoded = Util.getFileAsString("data/responses/unsigned_response_with_miliseconds.xm.base64");
 		settings.setStrict(false);
@@ -2297,7 +2296,7 @@ public class AuthnResponseTest {
 	}
 
 	@Test
-	public void testParseAzureB2CTimestamp() throws IOException, Error, XPathExpressionException, ParserConfigurationException, SAXException, SettingsException, ValidationError {
+	public void testParseAzureB2CTimestamp() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.min.properties").build();
 		String samlResponseEncoded = Util.getFileAsString("data/responses/invalids/redacted_azure_b2c.xml.base64");
 		
@@ -2338,7 +2337,7 @@ public class AuthnResponseTest {
 	 * @see com.onelogin.saml2.authn.SamlResponse#isValid
 	 */
 	@Test
-	public void testIsInValidRequestId() throws IOException, Error, XPathExpressionException, ParserConfigurationException, SAXException, SettingsException, ValidationError {
+	public void testIsInValidRequestId() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.my.properties").build();
 		String samlResponseEncoded = Util.getFileAsString("data/responses/valid_response.xml.base64");
 		settings.setStrict(false);
@@ -2398,7 +2397,7 @@ public class AuthnResponseTest {
 	 * @see com.onelogin.saml2.authn.SamlResponse#isValid
 	 */
 	@Test
-	public void testIsInValidSignIssues() throws IOException, Error, XPathExpressionException, ParserConfigurationException, SAXException, SettingsException, ValidationError {
+	public void testIsInValidSignIssues() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.min.properties").build();
 		String samlResponseEncoded = Util.getFileAsString("data/responses/unsigned_response.xml.base64");
 		settings.setStrict(false);
@@ -2469,7 +2468,7 @@ public class AuthnResponseTest {
 	 * @see com.onelogin.saml2.authn.SamlResponse#isValid
 	 */
 	@Test
-	public void testIsInValidEncIssues() throws IOException, Error, XPathExpressionException, ParserConfigurationException, SAXException, SettingsException, ValidationError {
+	public void testIsInValidEncIssues() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.min.properties").build();
 		String samlResponseEncoded = Util.getFileAsString("data/responses/unsigned_response.xml.base64");
 		settings.setStrict(false);
@@ -2540,7 +2539,7 @@ public class AuthnResponseTest {
 	 * @see com.onelogin.saml2.authn.SamlResponse#isValid
 	 */
 	@Test
-	public void testIsInValidCert() throws IOException, Error, XPathExpressionException, ParserConfigurationException, SAXException, SettingsException, ValidationError {
+	public void testIsInValidCert() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.invalididpcertstring.properties").build();
 		settings.setStrict(false);
 		String samlResponseEncoded = Util.getFileAsString("data/responses/valid_response.xml.base64");
@@ -2564,7 +2563,7 @@ public class AuthnResponseTest {
 	 * @see com.onelogin.saml2.authn.SamlResponse#isValid
 	 */
 	@Test
-	public void testNamespaceIsValid() throws IOException, Error, XPathExpressionException, ParserConfigurationException, SAXException, SettingsException, ValidationError {
+	public void testNamespaceIsValid() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.my.properties").build();
 		String samlResponseEncoded = Util.getFileAsString("data/responses/response_namespaces.xml.base64");
 
@@ -2592,7 +2591,7 @@ public class AuthnResponseTest {
 	 * @see com.onelogin.saml2.authn.SamlResponse#isValid
 	 */
 	@Test
-	public void testADFSValid() throws IOException, Error, XPathExpressionException, ParserConfigurationException, SAXException, SettingsException, ValidationError {
+	public void testADFSValid() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.adfs.properties").build();
 		String samlResponseEncoded = Util.getFileAsString("data/responses/response_adfs1.xml.base64");
 
@@ -2620,7 +2619,7 @@ public class AuthnResponseTest {
 	 * @see com.onelogin.saml2.authn.SamlResponse#isValid
 	 */
 	@Test
-	public void testIsValid() throws IOException, Error, XPathExpressionException, ParserConfigurationException, SAXException, SettingsException, ValidationError {
+	public void testIsValid() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.my.properties").build();
 		String samlResponseEncoded = Util.getFileAsString("data/responses/valid_response.xml.base64");
 
@@ -2648,7 +2647,7 @@ public class AuthnResponseTest {
 	 * @see com.onelogin.saml2.authn.SamlResponse#isValid
 	 */
 	@Test
-	public void testIsValid2() throws IOException, Error, XPathExpressionException, ParserConfigurationException, SAXException, SettingsException, ValidationError {
+	public void testIsValid2() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.mywithnocert.properties").build();
 		String samlResponseEncoded = Util.getFileAsString("data/responses/valid_response.xml.base64");
 
@@ -2725,7 +2724,7 @@ public class AuthnResponseTest {
 	 * @see com.onelogin.saml2.authn.SamlResponse#isValid
 	 */
 	@Test
-	public void testIsInValidSignWithDeprecatedAlg() throws IOException, Error, XPathExpressionException, ParserConfigurationException, SAXException, SettingsException, ValidationError {
+	public void testIsInValidSignWithDeprecatedAlg() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.my.properties").build();
 		settings.setWantAssertionsSigned(false);
 		settings.setWantMessagesSigned(false);
@@ -2773,7 +2772,7 @@ public class AuthnResponseTest {
 	 * @see com.onelogin.saml2.authn.SamlResponse#isValid
 	 */
 	@Test
-	public void testIsValidSign() throws IOException, Error, XPathExpressionException, ParserConfigurationException, SAXException, SettingsException, ValidationError {
+	public void testIsValidSign() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.my.properties").build();
 		settings.setWantAssertionsSigned(false);
 		settings.setWantMessagesSigned(false);
@@ -2823,7 +2822,7 @@ public class AuthnResponseTest {
 	 * @see com.onelogin.saml2.authn.SamlResponse#isValid
 	 */
 	@Test
-	public void testIsValidSignWithCertMulti() throws IOException, Error, XPathExpressionException, ParserConfigurationException, SAXException, SettingsException, ValidationError {
+	public void testIsValidSignWithCertMulti() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.mywithmulticert.properties").build();
 		settings.setWantAssertionsSigned(false);
 		settings.setWantMessagesSigned(false);
@@ -2873,20 +2872,20 @@ public class AuthnResponseTest {
 	 * @see com.onelogin.saml2.authn.SamlResponse#processSignedElements
 	 */
 	@Test
-	public void testProcessSignedElementsInvalidSignElement() throws IOException, Error, XPathExpressionException, ParserConfigurationException, SAXException, SettingsException, ValidationError {
+	public void testProcessSignedElementsInvalidSignElement() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.my.properties").build();
 		String samlResponseEncoded = Util.getFileAsString("data/responses/signed_message_response.xml.base64");
 
 		SamlResponse samlResponse = new SamlResponse(settings, newHttpRequest(samlResponseEncoded));
-		assertTrue(!samlResponse.processSignedElements().isEmpty());
+        assertFalse(samlResponse.processSignedElements().isEmpty());
 
 		samlResponseEncoded = Util.getFileAsString("data/responses/signed_assertion_response.xml.base64");
 		samlResponse = new SamlResponse(settings, newHttpRequest(samlResponseEncoded));
-		assertTrue(!samlResponse.processSignedElements().isEmpty());
+        assertFalse(samlResponse.processSignedElements().isEmpty());
 
 		samlResponseEncoded = Util.getFileAsString("data/responses/double_signed_response.xml.base64");
 		samlResponse = new SamlResponse(settings, newHttpRequest(samlResponseEncoded));
-		assertTrue(!samlResponse.processSignedElements().isEmpty());
+        assertFalse(samlResponse.processSignedElements().isEmpty());
 
 		samlResponseEncoded = Util.getFileAsString("data/responses/unsigned_response.xml.base64");
 		samlResponse = new SamlResponse(settings, newHttpRequest(samlResponseEncoded));
@@ -2908,7 +2907,7 @@ public class AuthnResponseTest {
 	 * @see com.onelogin.saml2.authn.SamlResponse#processSignedElements
 	 */
 	@Test
-	public void testProcessSignedElementsInvalidSignElem() throws IOException, Error, XPathExpressionException, ParserConfigurationException, SAXException, SettingsException, ValidationError {
+	public void testProcessSignedElementsInvalidSignElem() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.my.properties").build();
 		String samlResponseEncoded = Util.getFileAsString("data/responses/invalids/wrong_signed_element.xml.base64");
 
@@ -2934,7 +2933,7 @@ public class AuthnResponseTest {
 	 * @see com.onelogin.saml2.authn.SamlResponse#processSignedElements
 	 */
 	@Test
-	public void testProcessSignedElementsInvalidSignElem2() throws IOException, Error, XPathExpressionException, ParserConfigurationException, SAXException, SettingsException, ValidationError {
+	public void testProcessSignedElementsInvalidSignElem2() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.my.properties").build();
 		String samlResponseEncoded = Util.getFileAsString("data/responses/invalids/wrong_signed_element2.xml.base64");
 
@@ -2960,7 +2959,7 @@ public class AuthnResponseTest {
 	 * @see com.onelogin.saml2.authn.SamlResponse#processSignedElements
 	 */
 	@Test
-	public void testProcessSignedElementsNoId() throws IOException, Error, XPathExpressionException, ParserConfigurationException, SAXException, SettingsException, ValidationError {
+	public void testProcessSignedElementsNoId() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.my.properties").build();
 		String samlResponseEncoded = Util.getFileAsString("data/responses/invalids/no_assertion_id.xml.base64");
 
@@ -2986,7 +2985,7 @@ public class AuthnResponseTest {
 	 * @see com.onelogin.saml2.authn.SamlResponse#processSignedElements
 	 */
 	@Test
-	public void testProcessSignedElementsDuplicateRef() throws IOException, Error, XPathExpressionException, ParserConfigurationException, SAXException, SettingsException, ValidationError {
+	public void testProcessSignedElementsDuplicateRef() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.my.properties").build();
 		String samlResponseEncoded = Util.getFileAsString("data/responses/invalids/duplicate_reference_uri.xml.base64");
 
@@ -3013,7 +3012,7 @@ public class AuthnResponseTest {
 	 * @see com.onelogin.saml2.authn.SamlResponse#isValid
 	 */
 	@Test
-	public void testIsInValidSign() throws IOException, Error, XPathExpressionException, ParserConfigurationException, SAXException, SettingsException, ValidationError { 
+	public void testIsInValidSign() throws Exception { 
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.min.properties").build();
 		settings.setStrict(true);
 		String samlResponseEncoded = Util.getFileAsString("data/responses/unsigned_response.xml.base64");
@@ -3082,7 +3081,7 @@ public class AuthnResponseTest {
 	 * @see com.onelogin.saml2.authn.SamlResponse#isValid
 	 */
 	@Test
-	public void testIsInValidSignWithCertMulti() throws IOException, Error, XPathExpressionException, ParserConfigurationException, SAXException, SettingsException, ValidationError { 
+	public void testIsInValidSignWithCertMulti() throws Exception { 
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.min.properties").build();
 		settings.setStrict(true);
 		String samlResponseEncoded = Util.getFileAsString("data/responses/unsigned_response.xml.base64");
@@ -3149,7 +3148,7 @@ public class AuthnResponseTest {
 	 * @see com.onelogin.saml2.authn.SamlResponse#validateSignedElements
 	 */
 	@Test
-	public void testValidateSignedElements() throws IOException, Error, XPathExpressionException, ParserConfigurationException, SAXException, SettingsException, ValidationError {
+	public void testValidateSignedElements() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.min.properties").build();
 		ArrayList<String> signedElements = new ArrayList<String>();
 		String samlResponseEncoded = Util.getFileAsString("data/responses/signed_message_response.xml.base64");
@@ -3230,7 +3229,7 @@ public class AuthnResponseTest {
 	 * @see com.onelogin.saml2.authn.SamlResponse#isValid
 	 */
 	@Test
-	public void testIsValidSignWithEmptyReferenceURI() throws IOException, Error, XPathExpressionException, ParserConfigurationException, SAXException, SettingsException, ValidationError {
+	public void testIsValidSignWithEmptyReferenceURI() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.noreferenceuri.properties").build();
 		settings.setWantAssertionsSigned(false);
 		settings.setWantMessagesSigned(false);
@@ -3265,7 +3264,7 @@ public class AuthnResponseTest {
 	 * @see com.onelogin.saml2.authn.SamlResponse#getError
 	 */
 	@Test
-	public void testGetError() throws IOException, Error, XPathExpressionException, ParserConfigurationException, SAXException, SettingsException, ValidationError {
+	public void testGetError() throws Exception {
 		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.my.properties").build();
 		settings.setStrict(true);
 		String samlResponseEncoded = Util.getFileAsString("data/responses/response4.xml.base64");

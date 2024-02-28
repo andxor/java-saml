@@ -1,42 +1,33 @@
 package com.onelogin.saml2.settings;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.security.Key;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.UnrecoverableKeyException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.security.*;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.Duration;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Objects;
-import java.util.Properties;
-import java.util.SortedMap;
-import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import com.onelogin.saml2.model.*;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.onelogin.saml2.exception.Error;
-import com.onelogin.saml2.model.Contact;
-import com.onelogin.saml2.model.KeyStoreSettings;
-import com.onelogin.saml2.model.Organization;
 import com.onelogin.saml2.util.Constants;
 import com.onelogin.saml2.util.Util;
+import reactor.util.annotation.NonNull;
 
 /**
  * SettingsBuilder class of Java Toolkit.
@@ -52,7 +43,7 @@ public class SettingsBuilder {
 	/**
 	 * Private property that contains the SAML settings
 	 */
-	private Map<String, Object> samlData = new LinkedHashMap<>();
+	private final Map<String, Object> samlData = new LinkedHashMap<>();
 
 	/**
 	 * Saml2Settings object
@@ -71,16 +62,45 @@ public class SettingsBuilder {
 	public final static String SP_NAMEIDFORMAT_PROPERTY_KEY = "onelogin.saml2.sp.nameidformat";
 
 	public final static String SP_X509CERT_PROPERTY_KEY = "onelogin.saml2.sp.x509cert";
+	public final static String SP_X509CERT_FILE_PROPERTY_KEY = "onelogin.saml2.sp.x509cert.file";
 	public final static String SP_PRIVATEKEY_PROPERTY_KEY = "onelogin.saml2.sp.privatekey";
+	public final static String SP_PRIVATEKEY_FILE_PROPERTY_KEY = "onelogin.saml2.sp.privatekey.file";
 	public final static String SP_X509CERTNEW_PROPERTY_KEY = "onelogin.saml2.sp.x509certNew";
 
 	public final static String SP_CONTACT_PROPERTY_KEY_PREFIX = "onelogin.saml2.sp.contact";
 	public final static String SP_CONTACT_CONTACT_TYPE_PROPERTY_KEY_SUFFIX = "contactType";
+	public final static String SP_CONTACT_CONTACT_SPID_ENTITY_TYPE_PROPERTY_KEY_SUFFIX = "spid_entity_type";
 	public final static String SP_CONTACT_COMPANY_PROPERTY_KEY_SUFFIX = "company";
 	public final static String SP_CONTACT_GIVEN_NAME_PROPERTY_KEY_SUFFIX = "given_name";
 	public final static String SP_CONTACT_SUR_NAME_PROPERTY_KEY_SUFFIX = "sur_name";
 	public final static String SP_CONTACT_EMAIL_ADDRESS_PROPERTY_KEY_PREFIX = "email_address";
 	public final static String SP_CONTACT_TELEPHONE_NUMBER_PROPERTY_KEY_PREFIX = "telephone_number";
+	public final static String SP_CONTACT_VAT_NUMBER_PROPERTY_KEY_PREFIX = "vat_number";
+	public final static String SP_CONTACT_FISCAL_CODE_PROPERTY_KEY_PREFIX = "fiscal_code";
+	public final static String SP_CONTACT_TAGS_PROPERTY_KEY_SUFFIX= "tags";
+
+	public final static String SP_CONTACT_CESSIONARIO_COMMITTENTE_REGISTRY_ID_COUNTRY_PROPERTY_KEY_PREFIX = "cessionario_committente.registry.id_country";
+	public final static String SP_CONTACT_CESSIONARIO_COMMITTENTE_REGISTRY_ID_CODE_PROPERTY_KEY_PREFIX = "cessionario_committente.registry.id_code";
+	public final static String SP_CONTACT_CESSIONARIO_COMMITTENTE_REGISTRY_DENOMINATION_PROPERTY_KEY_PREFIX = "cessionario_committente.registry.denomination";
+	public final static String SP_CONTACT_CESSIONARIO_COMMITTENTE_HQ_ADDRESS_PROPERTY_KEY_PREFIX = "cessionario_committente.hq.address";
+	public final static String SP_CONTACT_CESSIONARIO_COMMITTENTE_HQ_ADDRESS_NUMBER_PROPERTY_KEY_PREFIX = "cessionario_committente.hq.address_number";
+	public final static String SP_CONTACT_CESSIONARIO_COMMITTENTE_HQ_POSTAL_CODE_PROPERTY_KEY_PREFIX = "cessionario_committente.hq.postal_code";
+	public final static String SP_CONTACT_CESSIONARIO_COMMITTENTE_HQ_CITY__PROPERTY_KEY_PREFIX = "cessionario_committente.hq.city";
+	public final static String SP_CONTACT_CESSIONARIO_COMMITTENTE_HQ_COUNTY_PROPERTY_KEY_PREFIX = "cessionario_committente.hq.county";
+
+	public final static String SP_ATTRIBUTE_CONSUMING_SERVICE_PROPERTY_KEY_PREFIX = "onelogin.saml2.sp.attribute_consuming_service";
+	public final static String SP_ATTRIBUTE_CONSUMING_SERVICE_NAME_PROPERTY_KEY_SUFFIX = "name";
+	public final static String SP_ATTRIBUTE_CONSUMING_SERVICE_DESCRIPTION_PROPERTY_KEY_SUFFIX = "description";
+	public final static String SP_ATTRIBUTE_CONSUMING_SERVICE_LANG_PROPERTY_KEY_SUFFIX = "lang";
+	public final static String SP_ATTRIBUTE_CONSUMING_SERVICE_DEFAULT_PROPERTY_KEY_SUFFIX = "default";
+
+	public final static String SP_ATTRIBUTE_CONSUMING_SERVICE_ATTRIBUTE_PROPERTY_KEY_PREFIX = "attribute";
+	public final static String SP_ATTRIBUTE_CONSUMING_SERVICE_ATTRIBUTE_NAME_PROPERTY_KEY_SUFFIX = "name";
+	public final static String SP_ATTRIBUTE_CONSUMING_SERVICE_ATTRIBUTE_NAME_FORMAT_PROPERTY_KEY_SUFFIX = "name_format";
+	public final static String SP_ATTRIBUTE_CONSUMING_SERVICE_ATTRIBUTE_FRIENDLY_NAME_PROPERTY_KEY_SUFFIX = "friendly_name";
+	public final static String SP_ATTRIBUTE_CONSUMING_SERVICE_ATTRIBUTE_REQUIRED_PROPERTY_KEY_SUFFIX = "required";
+	public final static String SP_ATTRIBUTE_CONSUMING_SERVICE_ATTRIBUTE_VALUE_PROPERTY_KEY_PREFIX = "value";
+
 
 	// KeyStore
 	public final static String KEYSTORE_KEY = "onelogin.saml2.keystore.store";
@@ -119,6 +139,8 @@ public class SettingsBuilder {
 	public final static String SECURITY_REJECT_UNSOLICITED_RESPONSES_WITH_INRESPONSETO = "onelogin.saml2.security.reject_unsolicited_responses_with_inresponseto";
 	public final static String SECURITY_ALLOW_REPEAT_ATTRIBUTE_NAME_PROPERTY_KEY = "onelogin.saml2.security.allow_duplicated_attribute_name";
 	public final static String SECURITY_REJECT_DEPRECATED_ALGORITHM = "onelogin.saml2.security.reject_deprecated_alg";
+	public final static String SECURITY_REJECT_RESPONSE_AFTER_REQUEST_TIME = "onelogin.saml2.security.reject_response_after_request_time";
+
 
 	// Compress
 	public final static String COMPRESS_REQUEST = "onelogin.saml2.compress.request";
@@ -171,29 +193,41 @@ public class SettingsBuilder {
 	 */
 	public SettingsBuilder fromFile(String propFileName, KeyStoreSettings keyStoreSetting) throws Error, IOException {
 
-		ClassLoader classLoader = getClass().getClassLoader();
-		try (InputStream inputStream = classLoader.getResourceAsStream(propFileName)) {
-			if (inputStream != null) {
-				Properties prop = new Properties();
-				prop.load(inputStream);
-				parseProperties(prop);
-				LOGGER.debug("properties file '{}' loaded succesfully", propFileName);
-			} else {
-				String errorMsg = "properties file '" + propFileName + "' not found in the classpath";
-				LOGGER.error(errorMsg);
+		if (propFileName.startsWith("/")) {
+			try (InputStream inputStream = Files.newInputStream(Paths.get(propFileName))) {
+				 loadProperties(inputStream);
+			} catch (IOException e) {
+				String errorMsg = "properties file'" + propFileName + "' not found";
+				LOGGER.error(errorMsg, e);
 				throw new Error(errorMsg, Error.SETTINGS_FILE_NOT_FOUND);
 			}
-		} catch (IOException e) {
-			String errorMsg = "properties file'" + propFileName + "' cannot be loaded.";
-			LOGGER.error(errorMsg, e);
-			throw new Error(errorMsg, Error.SETTINGS_FILE_NOT_FOUND);
+		} else {
+			try (InputStream inputStream =  getClass().getClassLoader().getResourceAsStream(propFileName)) {
+				loadProperties(inputStream);
+			} catch (IOException e) {
+				String errorMsg = "properties file'" + propFileName + "' not found in classpath";
+				LOGGER.error(errorMsg, e);
+				throw new Error(errorMsg, Error.SETTINGS_FILE_NOT_FOUND);
+			}
 		}
+
 		// Parse KeyStore and set the properties for SP Cert and Key
 		if (keyStoreSetting != null) {
 			parseKeyStore(keyStoreSetting);
 		}
 
 		return this;
+	}
+
+
+	private void loadProperties(InputStream inputStream) throws IOException, Error {
+		if (inputStream != null) {
+			Properties prop = new Properties();
+			prop.load(inputStream);
+			parseProperties(prop);
+		} else {
+			throw new Error("properties file not found", Error.SETTINGS_FILE_NOT_FOUND);
+		}
 	}
 
 	/**
@@ -247,7 +281,7 @@ public class SettingsBuilder {
 	 * @return the Saml2Settings object with all the SAML settings loaded
 	 *
 	 */
-	public Saml2Settings build() {
+	public Saml2Settings build() throws Exception {
 		return build(new Saml2Settings());
 	}
 
@@ -260,7 +294,7 @@ public class SettingsBuilder {
 	 * @return the Saml2Settings object with all the SAML settings loaded
 	 *
 	 */
-	public Saml2Settings build(Saml2Settings saml2Setting) {
+	public Saml2Settings build(Saml2Settings saml2Setting) throws Exception {
 
 		this.saml2Setting = saml2Setting;
 
@@ -299,6 +333,137 @@ public class SettingsBuilder {
 
 		return saml2Setting;
 	}
+
+	/**
+	 * Loads the Attribute Consuming Services from settings.
+	 *
+	 * @return a list containing the loaded Attribute Consuming Services
+	 */
+	private List<AttributeConsumingService> loadAttributeConsumingServices() {
+		// first split properties into a map of properties
+		// key = service index; value = service properties
+		final SortedMap<Integer, Map<String, Object>> acsProps =
+				extractIndexedProperties(SP_ATTRIBUTE_CONSUMING_SERVICE_PROPERTY_KEY_PREFIX, samlData);
+		// then build each Attribute Consuming Service
+		if(acsProps.containsKey(-1) && acsProps.size() == 1)
+			// single service specified; use index 1 for backward compatibility
+			return Arrays.asList(loadAttributeConsumingService(acsProps.get(-1), 1));
+		else
+			// multiple indexed services specified
+			return acsProps.entrySet().stream()
+					// ignore non-indexed service
+					.filter(entry -> {
+						final boolean indexed = entry.getKey() != -1;
+						if(!indexed) {
+							LOGGER.warn("non indexed Attribute Consuming Service found along with other indexed Services; the non-indexed one will be ignored");
+						}
+						return indexed;
+					})
+					.map(entry -> loadAttributeConsumingService(entry.getValue(), entry.getKey()))
+					.collect(Collectors.toList());
+	}
+
+	/**
+	 * Loads a single Attribute Consuming Service from settings.
+	 *
+	 * @param acsProps
+	 *              a map containing the Attribute Consuming Service settings
+	 * @param index
+	 *              the index to be set on the returned Attribute Consuming Service
+	 * @return the loaded Attribute Consuming Service
+	 */
+	private AttributeConsumingService loadAttributeConsumingService(Map<String, Object> acsProps, int index) {
+		final String serviceName =  loadStringProperty(SP_ATTRIBUTE_CONSUMING_SERVICE_NAME_PROPERTY_KEY_SUFFIX, acsProps);
+		final String serviceDescription = loadStringProperty(SP_ATTRIBUTE_CONSUMING_SERVICE_DESCRIPTION_PROPERTY_KEY_SUFFIX, acsProps);
+		final String lang = loadStringProperty(SP_ATTRIBUTE_CONSUMING_SERVICE_LANG_PROPERTY_KEY_SUFFIX, acsProps);
+		final Boolean isDefault = loadBooleanProperty(SP_ATTRIBUTE_CONSUMING_SERVICE_DEFAULT_PROPERTY_KEY_SUFFIX, acsProps);
+		final AttributeConsumingService acs = new AttributeConsumingService(index, isDefault, serviceName, serviceDescription, lang);
+		// split properties into a map of properties
+		// key = attribute index; value = attribute properties
+		final SortedMap<Integer, Map<String, Object>> attributeProps = extractIndexedProperties(SP_ATTRIBUTE_CONSUMING_SERVICE_ATTRIBUTE_PROPERTY_KEY_PREFIX, acsProps);
+		// build attributes
+		attributeProps.forEach((attributeIndex, attributeData) -> {
+			acs.addRequestedAttribute(loadRequestedAttribute(attributeData));
+		});
+		return acs;
+	}
+
+	/**
+	 * Loads a requested attribute from settings.
+	 *
+	 * @param attributeProps
+	 *              a map containing the attribute settings
+	 * @return the loaded attribute
+	 */
+	private RequestedAttribute loadRequestedAttribute(Map<String, Object> attributeProps) {
+		final String name = loadStringProperty(SP_ATTRIBUTE_CONSUMING_SERVICE_ATTRIBUTE_NAME_PROPERTY_KEY_SUFFIX, attributeProps);
+		final String nameFormat = loadStringProperty(SP_ATTRIBUTE_CONSUMING_SERVICE_ATTRIBUTE_NAME_FORMAT_PROPERTY_KEY_SUFFIX, attributeProps);
+		final String friendlyName = loadStringProperty(SP_ATTRIBUTE_CONSUMING_SERVICE_ATTRIBUTE_FRIENDLY_NAME_PROPERTY_KEY_SUFFIX, attributeProps);
+		final Boolean required = loadBooleanProperty(SP_ATTRIBUTE_CONSUMING_SERVICE_ATTRIBUTE_REQUIRED_PROPERTY_KEY_SUFFIX, attributeProps);
+		// split properties into a map of properties
+		// key = value index; value = the actual value
+		final SortedMap<Integer, Object> values = extractIndexedValues(SP_ATTRIBUTE_CONSUMING_SERVICE_ATTRIBUTE_VALUE_PROPERTY_KEY_PREFIX, attributeProps);
+		final List<String> stringValues = values.values().stream()
+				.map(value -> isString(value) ? StringUtils.trimToNull((String) value) : null)
+				.filter(Objects::nonNull).collect(Collectors.toList());
+		return new RequestedAttribute(name, friendlyName, required, nameFormat, stringValues);
+	}
+
+	/**
+	 * Loads the IdP settings from the properties file
+	 */
+	public void loadIdpSettingFromMap(Map<String, Object> idpMap) {
+		String idpEntityID = loadStringProperty(IDP_ENTITYID_PROPERTY_KEY, idpMap);
+		if (idpEntityID != null) {
+			saml2Setting.setIdpEntityId(idpEntityID);
+		}
+
+		URL idpSingleSignOnServiceUrl = loadURLProperty(IDP_SINGLE_SIGN_ON_SERVICE_URL_PROPERTY_KEY, idpMap);
+		if (idpSingleSignOnServiceUrl != null) {
+			saml2Setting.setIdpSingleSignOnServiceUrl(idpSingleSignOnServiceUrl);
+		}
+
+		String idpSingleSignOnServiceBinding = loadStringProperty(IDP_SINGLE_SIGN_ON_SERVICE_BINDING_PROPERTY_KEY, idpMap);
+		if (idpSingleSignOnServiceBinding != null) {
+			saml2Setting.setIdpSingleSignOnServiceBinding(idpSingleSignOnServiceBinding);
+		}
+
+		URL idpSingleLogoutServiceUrl = loadURLProperty(IDP_SINGLE_LOGOUT_SERVICE_URL_PROPERTY_KEY, idpMap);
+		if (idpSingleLogoutServiceUrl != null) {
+			saml2Setting.setIdpSingleLogoutServiceUrl(idpSingleLogoutServiceUrl);
+		}
+
+		URL idpSingleLogoutServiceResponseUrl = loadURLProperty(IDP_SINGLE_LOGOUT_SERVICE_RESPONSE_URL_PROPERTY_KEY, idpMap);
+		if (idpSingleLogoutServiceResponseUrl != null) {
+			saml2Setting.setIdpSingleLogoutServiceResponseUrl(idpSingleLogoutServiceResponseUrl);
+		}
+
+		String idpSingleLogoutServiceBinding = loadStringProperty(IDP_SINGLE_LOGOUT_SERVICE_BINDING_PROPERTY_KEY, idpMap);
+		if (idpSingleLogoutServiceBinding != null) {
+			saml2Setting.setIdpSingleLogoutServiceBinding(idpSingleLogoutServiceBinding);
+		}
+
+		List<X509Certificate> idpX509certMulti = loadCertificateListFromProp(IDP_X509CERTMULTI_PROPERTY_KEY, idpMap);
+		if (idpX509certMulti != null) {
+			saml2Setting.setIdpx509certMulti(idpX509certMulti);
+		}
+
+		X509Certificate idpX509cert = loadCertificateFromPropMap(IDP_X509CERT_PROPERTY_KEY, idpMap);
+		if (idpX509cert != null) {
+			saml2Setting.setIdpx509cert(idpX509cert);
+		}
+
+		String idpCertFingerprint = loadStringProperty(CERTFINGERPRINT_PROPERTY_KEY, idpMap);
+		if (idpCertFingerprint != null) {
+			saml2Setting.setIdpCertFingerprint(idpCertFingerprint);
+		}
+
+		String idpCertFingerprintAlgorithm = loadStringProperty(CERTFINGERPRINT_ALGORITHM_PROPERTY_KEY, idpMap);
+		if (idpCertFingerprintAlgorithm != null && !idpCertFingerprintAlgorithm.isEmpty()) {
+			saml2Setting.setIdpCertFingerprintAlgorithm(idpCertFingerprintAlgorithm);
+		}
+	}
+
 
 	/**
 	 * Loads the IdP settings from the properties file
@@ -433,6 +598,10 @@ public class SettingsBuilder {
 		if (rejectDeprecatedAlg != null) {
 			saml2Setting.setRejectDeprecatedAlg(rejectDeprecatedAlg);
 		}
+		saml2Setting.setRejectResponseAfterRequestSeconds(StringUtils.defaultIfBlank(
+				loadStringProperty(SECURITY_REJECT_RESPONSE_AFTER_REQUEST_TIME), "300")
+		);
+
 	}
 
 	/**
@@ -541,7 +710,30 @@ public class SettingsBuilder {
 		// key = phone number index; value = phone numbers
 		final SortedMap<Integer, Object> phoneNumbers = extractIndexedValues(SP_CONTACT_TELEPHONE_NUMBER_PROPERTY_KEY_PREFIX, contactProps);
 		final List<String> numbers = toStringList(phoneNumbers);
-		return new Contact(contactType, company, givenName, surName, emails, numbers);
+	    final String vatNumber = loadStringProperty(SP_CONTACT_VAT_NUMBER_PROPERTY_KEY_PREFIX, contactProps);
+	    final String fiscalCode = loadStringProperty(SP_CONTACT_FISCAL_CODE_PROPERTY_KEY_PREFIX, contactProps);
+		final String spidEntityType = loadStringProperty(SP_CONTACT_CONTACT_SPID_ENTITY_TYPE_PROPERTY_KEY_SUFFIX, contactProps);
+		CessionarioCommittente cessionarioCommittente = null;
+		if ("billing".equals(contactType)) {
+			final String cmIDCountry = loadStringProperty(SP_CONTACT_CESSIONARIO_COMMITTENTE_REGISTRY_ID_COUNTRY_PROPERTY_KEY_PREFIX, contactProps);
+			final String cmIDCode = loadStringProperty(SP_CONTACT_CESSIONARIO_COMMITTENTE_REGISTRY_ID_CODE_PROPERTY_KEY_PREFIX, contactProps);
+			final String cmIDDenomination = loadStringProperty(SP_CONTACT_CESSIONARIO_COMMITTENTE_REGISTRY_DENOMINATION_PROPERTY_KEY_PREFIX, contactProps);
+
+			final String hqAddress = loadStringProperty(SP_CONTACT_CESSIONARIO_COMMITTENTE_HQ_ADDRESS_PROPERTY_KEY_PREFIX, contactProps);
+			final String hqAddressNumber = loadStringProperty(SP_CONTACT_CESSIONARIO_COMMITTENTE_HQ_ADDRESS_NUMBER_PROPERTY_KEY_PREFIX, contactProps);
+			final String hqPostalCode = loadStringProperty(SP_CONTACT_CESSIONARIO_COMMITTENTE_HQ_POSTAL_CODE_PROPERTY_KEY_PREFIX, contactProps);
+			final String hqCity = loadStringProperty(SP_CONTACT_CESSIONARIO_COMMITTENTE_HQ_CITY__PROPERTY_KEY_PREFIX, contactProps);
+			final String hqCounty = loadStringProperty(SP_CONTACT_CESSIONARIO_COMMITTENTE_HQ_COUNTY_PROPERTY_KEY_PREFIX, contactProps);
+			cessionarioCommittente = new CessionarioCommittente(cmIDCountry, cmIDCode, cmIDDenomination, hqAddress, hqAddressNumber, hqPostalCode, hqCity, hqCounty);
+		}
+		List<String> tags = safeSplitToList(loadStringProperty(SP_CONTACT_TAGS_PROPERTY_KEY_SUFFIX, contactProps), ",");
+		return new Contact(contactType, company, givenName, surName, emails, numbers, fiscalCode, vatNumber, cessionarioCommittente, spidEntityType, tags);
+	}
+
+	private List<String> safeSplitToList(String toSplit, String splitter) {
+		if (StringUtils.isBlank(toSplit)) return Collections.emptyList();
+		if (StringUtils.isEmpty(splitter)) return Collections.emptyList();
+		return Arrays.asList(toSplit.split(splitter));
 	}
 
 	/**
@@ -702,7 +894,7 @@ public class SettingsBuilder {
 	/**
 	 * Loads the SP settings from the properties file
 	 */
-	private void loadSpSetting() {
+	private void loadSpSetting() throws Exception {
 		String spEntityID = loadStringProperty(SP_ENTITYID_PROPERTY_KEY);
 		if (spEntityID != null) {
 			saml2Setting.setSpEntityId(spEntityID);
@@ -733,8 +925,17 @@ public class SettingsBuilder {
 			saml2Setting.setSpNameIDFormat(spNameIDFormat);
 		}
 
+		List<AttributeConsumingService> attributeConsumingServices = loadAttributeConsumingServices();
+		if (attributeConsumingServices.size() == 1 && attributeConsumingServices.get(0) != null) {
+			attributeConsumingServices.get(0).setDefault(true);
+		}
+		saml2Setting.setSpAttributeConsumingServices(attributeConsumingServices);
+
+
 		boolean keyStoreEnabled = this.samlData.get(KEYSTORE_KEY) != null && this.samlData.get(KEYSTORE_ALIAS) != null
 				&& this.samlData.get(KEYSTORE_KEY_PASSWORD) != null;
+
+
 
 		X509Certificate spX509cert;
 		PrivateKey spPrivateKey;
@@ -747,8 +948,8 @@ public class SettingsBuilder {
 			spX509cert = getCertificateFromKeyStore(ks, alias, password);
 			spPrivateKey = getPrivateKeyFromKeyStore(ks, alias, password);
 		} else {
-			spX509cert = loadCertificateFromProp(SP_X509CERT_PROPERTY_KEY);
-			spPrivateKey = loadPrivateKeyFromProp(SP_PRIVATEKEY_PROPERTY_KEY);
+			spX509cert =  Objects.requireNonNullElse(loadCertificateFromFile(loadStringProperty(SP_X509CERT_FILE_PROPERTY_KEY)), loadCertificateFromProp(SP_X509CERT_PROPERTY_KEY));
+			spPrivateKey = Objects.requireNonNullElse(loadPrivateKeyFromFile(loadStringProperty(SP_PRIVATEKEY_FILE_PROPERTY_KEY)), loadPrivateKeyFromProp(SP_PRIVATEKEY_PROPERTY_KEY));
 		}
 
 		if (spX509cert != null) {
@@ -783,23 +984,28 @@ public class SettingsBuilder {
 	 *
 	 * @return the value
 	 */
-	private String loadStringProperty(String propertyKey, Map<String, Object> data) {
+	public String loadStringProperty(String propertyKey, Map<String, Object> data) {
 		Object propValue = data.get(propertyKey);
 		if (isString(propValue)) {
 			return StringUtils.trimToNull((String) propValue);
 		}
 		return null;
 	}
+	public Boolean loadBooleanProperty(String propertyKey) {
+		Object propValue = samlData.get(propertyKey);
+		return loadBooleanProperty(propertyKey, samlData);
+	}
 
 	/**
-	 * Loads a property of the type Boolean from the Properties object
+	 * Loads a property of the type Boolean from the specified data
 	 *
 	 * @param propertyKey the property name
+	 * @param data the input data
 	 *
 	 * @return the value
 	 */
-	private Boolean loadBooleanProperty(String propertyKey) {
-		Object propValue = samlData.get(propertyKey);
+	public Boolean loadBooleanProperty(String propertyKey, Map<String, Object> data) {
+		Object propValue = data.get(propertyKey);
 		if (isString(propValue)) {
 			return Boolean.parseBoolean(((String) propValue).trim());
 		}
@@ -817,7 +1023,7 @@ public class SettingsBuilder {
 	 *
 	 * @return the value
 	 */
-	private List<String> loadListProperty(String propertyKey) {
+	public List<String> loadListProperty(String propertyKey) {
 		Object propValue = samlData.get(propertyKey);
 		if (isString(propValue)) {
 			String[] values = ((String) propValue).trim().split(",");
@@ -840,9 +1046,13 @@ public class SettingsBuilder {
 	 *
 	 * @return the value
 	 */
-	private URL loadURLProperty(String propertyKey) {
+	public URL loadURLProperty(String propertyKey) {
+		return loadURLProperty(propertyKey, this.samlData);
+	}
 
-		Object propValue = samlData.get(propertyKey);
+	static public URL loadURLProperty(String propertyKey, Map<String, Object> map) {
+
+		Object propValue = map.get(propertyKey);
 
 		if (isString(propValue)) {
 			try {
@@ -860,7 +1070,7 @@ public class SettingsBuilder {
 		return null;
 	}
 
-	protected PrivateKey getPrivateKeyFromKeyStore(KeyStore keyStore, String alias, String password) {
+	public PrivateKey getPrivateKeyFromKeyStore(KeyStore keyStore, String alias, String password) {
 		Key key;
 		try {
 			if (keyStore.containsAlias(alias)) {
@@ -877,7 +1087,7 @@ public class SettingsBuilder {
 		return null;
 	}
 
-	protected X509Certificate getCertificateFromKeyStore(KeyStore keyStore, String alias, String password) {
+	public X509Certificate getCertificateFromKeyStore(KeyStore keyStore, String alias, String password) {
 		try {
 			if (keyStore.containsAlias(alias)) {
 				Key key = keyStore.getKey(alias, password.toCharArray());
@@ -903,7 +1113,7 @@ public class SettingsBuilder {
 	 *
 	 * @return the X509Certificate object
 	 */
-	protected X509Certificate loadCertificateFromProp(Object propValue) {
+	public X509Certificate loadCertificateFromProp(Object propValue) {
 
 		if (isString(propValue)) {
 			try {
@@ -928,8 +1138,29 @@ public class SettingsBuilder {
 	 *
 	 * @return the X509Certificate object
 	 */
-	protected X509Certificate loadCertificateFromProp(String propertyKey) {
+	public X509Certificate loadCertificateFromProp(String propertyKey) {
 		return loadCertificateFromProp(samlData.get(propertyKey));
+	}
+
+	public X509Certificate loadCertificateFromPropMap(String propertyKey, Map<String, Object> map) {
+		return loadCertificateFromProp(map.get(propertyKey));
+	}
+
+
+	public List<X509Certificate> loadCertificateListFromProp(String propertyKey, Map<String, Object> map) {
+		List<X509Certificate> list = new ArrayList<X509Certificate>();
+
+		int i = 0;
+		while (true) {
+			Object propValue = map.get(propertyKey + "." + i++);
+
+			if (propValue == null)
+				break;
+
+			list.add(loadCertificateFromProp(propValue));
+		}
+
+		return list;
 	}
 
 	/**
@@ -940,7 +1171,7 @@ public class SettingsBuilder {
 	 *
 	 * @return the X509Certificate object list
 	 */
-	private List<X509Certificate> loadCertificateListFromProp(String propertyKey) {
+	public List<X509Certificate> loadCertificateListFromProp(String propertyKey) {
 		List<X509Certificate> list = new ArrayList<X509Certificate>();
 
 		int i = 0;
@@ -963,31 +1194,34 @@ public class SettingsBuilder {
 	 *
 	 * @return the X509Certificate object
 	 */
-	/*
-	protected X509Certificate loadCertificateFromFile(String filename) {
-		String certString = null;
-		try {
-			certString = Util.getFileAsString(filename.trim());
-		} catch (URISyntaxException e) {
-			LOGGER.error("Error loading certificate from file.", e);
-			return null;
-		}
-		catch (IOException e) {
-			LOGGER.error("Error loading certificate from file.", e);
-			return null;
-		}
 
-		try {
+	public X509Certificate loadCertificateFromFile(String filename) throws Exception {
+			String certString = loadFFile(filename);
 			return Util.loadCert(certString);
-		} catch (CertificateException e) {
-			LOGGER.error("Error loading certificate from file.", e);
-			return null;
-		} catch (UnsupportedEncodingException e) {
-			LOGGER.error("the certificate is not in correct format.", e);
+	}
+
+
+	/**
+	 * Loads a property of the type PrivateKey from file
+	 *
+	 * @param filename the file name of the file that contains the X509Certificate
+	 *
+	 * @return the X509Certificate object
+	 */
+
+	protected PrivateKey loadPrivateKeyFromFile(String filename) throws Exception {
+			String keyString = loadFFile(filename);
+			return Util.loadPrivateKey(keyString.trim());
+	}
+
+
+	private String loadFFile(String filename) throws IOException {
+		if (filename == null) {
 			return null;
 		}
+		return Files.readString(Path.of(filename.trim()));
 	}
-	*/
+
 
 	/**
 	 * Loads a property of the type PrivateKey from the Properties object
@@ -1044,7 +1278,7 @@ public class SettingsBuilder {
 	 *
 	 * @param propValue the Object to be verified
 	 */
-	private boolean isString(Object propValue) {
+	static private boolean isString(Object propValue) {
 		return propValue instanceof String && StringUtils.isNotBlank((String) propValue);
 	}
 }

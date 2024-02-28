@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.onelogin</groupId>
 	<artifactId>java-saml-toolkit</artifactId>
-	<version>2.9.1-SNAPSHOT</version>
+	<version>2.9.2-ANDXOR-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>java-saml Toolkit Project</name>
@@ -86,32 +86,14 @@
 								</requireMavenVersion>
 								<requireJavaVersion>
 									<!-- enforce =1.8 so that we compile against the right JRE -->
-									<version>[1.8,)</version>
+									<version>[17,)</version>
 								</requireJavaVersion>
 							</rules>
 						</configuration>
 					</execution>
 				</executions>
 			</plugin>
-			<plugin>
-				<groupId>org.owasp</groupId>
-				<artifactId>dependency-check-maven</artifactId>
-				<version>8.4.0</version>
-				<configuration>
-					<failBuildOnCVSS>7</failBuildOnCVSS>
-					<suppressionFiles>
-						<suppressionFile>.nvd-suppressions.xml</suppressionFile>
-					</suppressionFiles>
-					<assemblyAnalyzerEnabled>false</assemblyAnalyzerEnabled>
-				</configuration>
-				<executions>
-					<execution>
-						<goals>
-							<goal>check</goal>
-						</goals>
-					 </execution>
-				</executions>
-			</plugin>
+
 		</plugins>
 		<pluginManagement>
 			<plugins>
@@ -119,8 +101,8 @@
 					<artifactId>maven-compiler-plugin</artifactId>
 					<version>3.8.1</version>
 					<configuration>
-						<source>1.8</source>
-						<target>1.8</target>
+						<source>17</source>
+						<target>17</target>
 					</configuration>
 				</plugin>
 				<plugin>
@@ -142,23 +124,16 @@
 
 	<distributionManagement>
 		<repository>
-			<id>sonatype-nexus-staging</id>
-			<name>Nexus Release Repository</name>
-			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+			<id>artifact</id>
+			<name>artifact.andxor.it-releases</name>
+			<url>https://artifact.andxor.it/artifactory/lib-external</url>
 		</repository>
 		<snapshotRepository>
-			<id>sonatype-nexus-snapshots</id>
-			<name>Sonatype Nexus Snapshots</name>
-			<url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+			<id>artifact</id>
+			<name>artifact.andxor.it-snapshots</name>
+			<url>https://artifact.andxor.it/artifactory/lib-external</url>
 		</snapshotRepository>
 	</distributionManagement>
-
-	<scm>
-		<connection>scm:git:git@github.com:saml-toolkit/java-saml.git</connection>
-		<developerConnection>scm:git:git@github.com:saml-toolkit/java-saml.git</developerConnection>
-		<url>https://github.com/saml-toolkit/java-saml</url>
-		<tag>HEAD</tag>
-	</scm>
 
 	<licenses>
 		<license>

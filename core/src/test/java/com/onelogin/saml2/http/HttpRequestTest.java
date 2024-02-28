@@ -91,7 +91,7 @@ public class HttpRequestTest {
         final String addedName = "added";
         final String addedValue = "added#value!";
 
-        final List<String> values = Arrays.asList(value1);
+        final List<String> values = List.of(value1);
         final Map<String, List<String>> parametersMap = singletonMap(name, values);
 
         final HttpRequest request = new HttpRequest(url, parametersMap, null).addParameter(addedName, addedValue);
@@ -108,7 +108,7 @@ public class HttpRequestTest {
         final String urlValue1 = "onUrl1";
         final String queryString = name + "=" + urlValue1;
 
-        final List<String> values = Arrays.asList(value1);
+        final List<String> values = List.of(value1);
         final Map<String, List<String>> parametersMap = singletonMap(name, values);
 
         final HttpRequest request = new HttpRequest(url, parametersMap, queryString);
@@ -184,7 +184,7 @@ public class HttpRequestTest {
         String encodedValue1 = NaiveUrlEncoder.encode(value1);
         final String queryString = name + "=" + encodedValue1;
 
-        final List<String> values = Arrays.asList(value1);
+        final List<String> values = List.of(value1);
         final Map<String, List<String>> parametersMap = singletonMap(name, values);
 
         final HttpRequest request = new HttpRequest(url, parametersMap, queryString).removeParameter(name);

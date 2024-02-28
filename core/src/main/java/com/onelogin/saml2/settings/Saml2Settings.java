@@ -3,13 +3,11 @@ package com.onelogin.saml2.settings;
 import java.net.URL;
 import java.security.PrivateKey;
 import java.security.cert.CertificateEncodingException;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
+import com.onelogin.saml2.model.AttributeConsumingService;
 import com.onelogin.saml2.model.hsm.HSM;
 
 import org.apache.commons.lang3.StringUtils;
@@ -22,6 +20,8 @@ import com.onelogin.saml2.model.Organization;
 import com.onelogin.saml2.util.Constants;
 import com.onelogin.saml2.util.SchemaFactory;
 import com.onelogin.saml2.util.Util;
+
+import static com.onelogin.saml2.settings.SettingsBuilder.*;
 
 /**
  * Saml2Settings class of Java Toolkit.
@@ -49,6 +49,8 @@ public class Saml2Settings {
 	private X509Certificate spX509certNew = null;
 	private PrivateKey spPrivateKey = null;
 	private HSM hsm = null;
+	private List<AttributeConsumingService> spAttributeConsumingServices = new ArrayList<>();
+
 
 	// IdP
 	private String idpEntityId = "";
@@ -96,6 +98,10 @@ public class Saml2Settings {
 	private Organization organization = null;
 
 	private boolean spValidationOnly = false;
+
+	private String rejectResponseAfterRequestSeconds;
+
+
 
 	/**
 	 * @return the strict setting value
@@ -550,7 +556,7 @@ public class Saml2Settings {
 	 * @param idpEntityId
 	 *            the idpEntityId value to be set
 	 */
-	protected final void setIdpEntityId(String idpEntityId) {
+	public final void setIdpEntityId(String idpEntityId) {
 		this.idpEntityId = idpEntityId;
 	}
 
@@ -560,7 +566,7 @@ public class Saml2Settings {
 	 * @param idpSingleSignOnServiceUrl
 	 *            the idpSingleSignOnServiceUrl value to be set
 	 */
-	protected final void setIdpSingleSignOnServiceUrl(URL idpSingleSignOnServiceUrl) {
+	public final void setIdpSingleSignOnServiceUrl(URL idpSingleSignOnServiceUrl) {
 		this.idpSingleSignOnServiceUrl = idpSingleSignOnServiceUrl;
 	}
 
@@ -570,7 +576,7 @@ public class Saml2Settings {
 	 * @param idpSingleSignOnServiceBinding
 	 *            the idpSingleSignOnServiceBinding value to be set
 	 */
-	protected final void setIdpSingleSignOnServiceBinding(String idpSingleSignOnServiceBinding) {
+	public final void setIdpSingleSignOnServiceBinding(String idpSingleSignOnServiceBinding) {
 		this.idpSingleSignOnServiceBinding = idpSingleSignOnServiceBinding;
 	}
 
@@ -580,7 +586,7 @@ public class Saml2Settings {
 	 * @param idpSingleLogoutServiceUrl
 	 *            the idpSingleLogoutServiceUrl value to be set
 	 */
-	protected final void setIdpSingleLogoutServiceUrl(URL idpSingleLogoutServiceUrl) {
+	public final void setIdpSingleLogoutServiceUrl(URL idpSingleLogoutServiceUrl) {
 		this.idpSingleLogoutServiceUrl = idpSingleLogoutServiceUrl;
 	}
 
@@ -590,7 +596,7 @@ public class Saml2Settings {
 	 * @param idpSingleLogoutServiceResponseUrl
 	 *            the idpSingleLogoutServiceUrl value to be set
 	 */
-	protected final void setIdpSingleLogoutServiceResponseUrl(URL idpSingleLogoutServiceResponseUrl) {
+	public final void setIdpSingleLogoutServiceResponseUrl(URL idpSingleLogoutServiceResponseUrl) {
 			this.idpSingleLogoutServiceResponseUrl = idpSingleLogoutServiceResponseUrl;
 	}
 
@@ -601,7 +607,7 @@ public class Saml2Settings {
 	 * @param idpSingleLogoutServiceBinding
 	 *            the idpSingleLogoutServiceBinding value to be set
 	 */
-	protected final void setIdpSingleLogoutServiceBinding(String idpSingleLogoutServiceBinding) {
+	public final void setIdpSingleLogoutServiceBinding(String idpSingleLogoutServiceBinding) {
 		this.idpSingleLogoutServiceBinding = idpSingleLogoutServiceBinding;
 	}
 
@@ -611,7 +617,7 @@ public class Saml2Settings {
 	 * @param idpX509cert
 	 *            the idpX509cert value to be set in X509Certificate format
 	 */
-	protected final void setIdpx509cert(X509Certificate idpX509cert) {
+	public final void setIdpx509cert(X509Certificate idpX509cert) {
 		this.idpx509cert = idpX509cert;
 	}
 
@@ -927,6 +933,72 @@ public class Saml2Settings {
 	}
 
 	/**
+	 * @return the SP Attribute Consuming Services
+	 */
+
+	public List<AttributeConsumingService> getSpAttributeConsumingServices() {
+		return spAttributeConsumingServices;
+	}
+
+	/**
+	 * Set the Attribute Consuming Services to be declared in the Service Provider
+	 * metadata
+	 *
+	 * @param spAttributeConsumingServices
+	 *              the Attribute Consuming Services to set
+	 */
+	public void setSpAttributeConsumingServices(List<AttributeConsumingService> spAttributeConsumingServices) {
+		this.spAttributeConsumingServices = spAttributeConsumingServices;
+	}
+
+
+	public String getRejectResponseAfterRequestSeconds() {
+		return rejectResponseAfterRequestSeconds;
+	}
+
+	public void setRejectResponseAfterRequestSeconds(String rejectResponseAfterRequestSeconds) {
+		this.rejectResponseAfterRequestSeconds = rejectResponseAfterRequestSeconds;
+	}
+
+	/*
+	 * Auxiliary method to check Attribute Consuming Services are properly
+	 * configured.
+	 *
+	 * @param errors the list to add to when an error is encountered
+	 */
+	private void checkAttributeConsumingServices(List<String> errors) {
+		List<AttributeConsumingService> attributeConsumingServices = getSpAttributeConsumingServices();
+		if(!attributeConsumingServices.isEmpty()) {
+			String errorMsg;
+			// all Attribute Consuming Services must have a service name
+			if(attributeConsumingServices.stream().anyMatch(service -> StringUtils.isEmpty(service.getServiceName()))) {
+				errorMsg = "sp_attribute_consuming_service_not_enough_data";
+				errors.add(errorMsg);
+				LOGGER.error(errorMsg);
+			}
+			// all Attribute Consuming Services must have at least one requested attribute
+			if(attributeConsumingServices.stream().anyMatch(service -> service.getRequestedAttributes().isEmpty())) {
+				errorMsg = "sp_attribute_consuming_service_no_requested_attribute";
+				errors.add(errorMsg);
+				LOGGER.error(errorMsg);
+			}
+			// there must be at most one with default = true
+			if(attributeConsumingServices.stream().filter(service -> Boolean.TRUE.equals(service.isDefault())).count() > 1) {
+				errorMsg = "sp_attribute_consuming_service_multiple_defaults";
+				errors.add(errorMsg);
+				LOGGER.error(errorMsg);
+			}
+			// all requested attributes must have a name
+			if(attributeConsumingServices.stream().flatMap(service -> service.getRequestedAttributes().stream())
+					.anyMatch(attribute -> StringUtils.isEmpty(attribute.getName()))) {
+				errorMsg = "sp_attribute_consuming_service_not_enough_requested_attribute_data";
+				errors.add(errorMsg);
+				LOGGER.error(errorMsg);
+			}
+		}
+	}
+
+	/**
 	 * Checks the settings .
 	 *
 	 * @return errors found on the settings data
@@ -1052,6 +1124,8 @@ public class Saml2Settings {
 			LOGGER.error(errorMsg);
 		}
 
+		checkAttributeConsumingServices(errors);
+
 		if (this.getHsm() != null && this.getSPkey() != null) {
 			errorMsg = "use_either_hsm_or_private_key";
 			errors.add(errorMsg);
@@ -1091,11 +1165,8 @@ public class Saml2Settings {
 			return false;
 		}
 
-		if (value instanceof List && ((List<?>) value).isEmpty()) {
-			return false;
-		}
-		return true;
-	}
+        return !(value instanceof List) || !((List<?>) value).isEmpty();
+    }
 
 	/**
 	 * Set the spValidationOnly value, used to check IdP data on checkSettings method
@@ -1196,5 +1267,54 @@ public class Saml2Settings {
 		// TODO Validate Sign if required with Util.validateMetadataSign
 
 		return errors;
+	}
+
+
+
+	public void injectIdpSettingFromMap(Map<String, Object> idpMap) throws CertificateException {
+		String idpEntityID = (String) idpMap.get(IDP_ENTITYID_PROPERTY_KEY);
+		if (idpEntityID != null) {
+			this.setIdpEntityId(idpEntityID);
+		}
+
+		URL idpSingleSignOnServiceUrl = loadURLProperty(IDP_SINGLE_SIGN_ON_SERVICE_URL_PROPERTY_KEY, idpMap);
+		if (idpSingleSignOnServiceUrl != null) {
+			this.setIdpSingleSignOnServiceUrl(idpSingleSignOnServiceUrl);
+		}
+
+		String idpSingleSignOnServiceBinding = (String) idpMap.get(IDP_SINGLE_SIGN_ON_SERVICE_BINDING_PROPERTY_KEY);
+		if (idpSingleSignOnServiceBinding != null) {
+			this.setIdpSingleSignOnServiceBinding(idpSingleSignOnServiceBinding);
+		}
+
+		URL idpSingleLogoutServiceUrl = loadURLProperty(IDP_SINGLE_LOGOUT_SERVICE_URL_PROPERTY_KEY, idpMap);
+		if (idpSingleLogoutServiceUrl != null) {
+			this.setIdpSingleLogoutServiceUrl(idpSingleLogoutServiceUrl);
+		}
+
+		URL idpSingleLogoutServiceResponseUrl = loadURLProperty(IDP_SINGLE_LOGOUT_SERVICE_RESPONSE_URL_PROPERTY_KEY, idpMap);
+		if (idpSingleLogoutServiceResponseUrl != null) {
+			this.setIdpSingleLogoutServiceResponseUrl(idpSingleLogoutServiceResponseUrl);
+		}
+
+		String idpSingleLogoutServiceBinding = (String) idpMap.get(IDP_SINGLE_LOGOUT_SERVICE_BINDING_PROPERTY_KEY);
+		if (idpSingleLogoutServiceBinding != null) {
+			this.setIdpSingleLogoutServiceBinding(idpSingleLogoutServiceBinding);
+		}
+
+		X509Certificate idpX509cert = Util.loadCert((String)idpMap.get(IDP_X509CERT_PROPERTY_KEY));
+		if (idpX509cert != null) {
+			this.setIdpx509cert(idpX509cert);
+		}
+
+		String idpCertFingerprint = (String) idpMap.get(CERTFINGERPRINT_PROPERTY_KEY);
+		if (idpCertFingerprint != null) {
+			this.setIdpCertFingerprint(idpCertFingerprint);
+		}
+
+		String idpCertFingerprintAlgorithm = (String) idpMap.get(CERTFINGERPRINT_ALGORITHM_PROPERTY_KEY);
+		if (idpCertFingerprintAlgorithm != null && !idpCertFingerprintAlgorithm.isEmpty()) {
+			this.setIdpCertFingerprintAlgorithm(idpCertFingerprintAlgorithm);
+		}
 	}
 }

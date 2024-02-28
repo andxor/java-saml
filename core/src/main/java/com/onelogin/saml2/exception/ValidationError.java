@@ -1,5 +1,8 @@
 package com.onelogin.saml2.exception;
 
+import java.util.Locale;
+import java.util.ResourceBundle;
+
 public class ValidationError extends SAMLException {
 
 	private static final long serialVersionUID = 1L;
@@ -55,13 +58,28 @@ public class ValidationError extends SAMLException {
 	public static final int MISSING_ENCRYPTED_ELEMENT = 48;
 	public static final int INVALID_ISSUE_INSTANT_FORMAT = 49;
 
-	private int errorCode;
+	//SPID SPECIFIC
+	public static final int INVALID_ISSUE_INSTANT = 50;
+	public static final int MISSING_ISSUER_FORMAT_ATTRIBUTE = 51;
+	public static final int WRONG_ISSUER_FORMAT_ATTRIBUTE = 52;
 
+	public static final int MISSING_ATTRIBUTE_VALUE_ELEMENT = 53;
+	public static final int MISSING_AUTH_CONTEXT = 54;
+	public static final int MISSING_AUTH_CONTEXT_CLASS_REF = 55;
+	public static final int WRONG_AUTH_CONTEXT_CLASS_REF = 56;
+
+	public static final int MISSING_NOT_ON_OR_AFTER_CONDITIONS = 57;
+	public static final int MISSING_NOT_BEFORE_CONDITIONS = 58;
+
+	private final int errorCode;
+
+
+	public static final String ERROR_PREFIX = "saml_error_";
 	public ValidationError(String message, int errorCode) {
 		super(message);
 		this.errorCode = errorCode;
 	}
-	
+
 	public int getErrorCode() {
 		return errorCode;
 	}

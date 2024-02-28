@@ -1,6 +1,7 @@
 package com.onelogin.saml2.test;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 
 public final  class NaiveUrlEncoder {
 
@@ -19,7 +20,7 @@ public final  class NaiveUrlEncoder {
      */
     public static String encode (String s) throws UnsupportedEncodingException {
         StringBuilder buf = new StringBuilder();
-        for  (byte b : s.getBytes("UTF-8")) {
+        for  (byte b : s.getBytes(StandardCharsets.UTF_8)) {
             buf.append("%");
             buf.append(String.format("%02x", b));
         }

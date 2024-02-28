@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import com.onelogin.saml2.authn.AttributeConsumingServiceSelector;
+import com.onelogin.saml2.model.AttributeConsumingService;
 import org.junit.Test;
 
 import com.onelogin.saml2.authn.AuthnRequest;
@@ -480,6 +482,59 @@ public class AuthnRequestTest {
 		assertThat(authnRequestStr, containsString("Format=\"urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified\">t&amp;stuser@example.com</saml:NameID>"));
 		assertThat(authnRequestStr, containsString("<saml:SubjectConfirmation Method=\"urn:oasis:names:tc:SAML:2.0:cm:bearer\">"));
 	}
+
+	/**
+	 * Tests the AuthnRequest Constructor
+	 * The creation of a deflated SAML Request with the index of the desired Attribute Consuming Service
+	 *
+	 * @throws Exception
+	 *
+	 * @see com.onelogin.saml2.authn.AuthnRequest
+	 */
+	@Test
+	public void testAttributeConsumingServiceSelector() throws Exception {
+		Saml2Settings settings = new SettingsBuilder().fromFile("config/config.min_multi_attribute_consuming_services.properties").build();
+
+		AuthnRequest authnRequest = new AuthnRequest(settings);
+		String authnRequestStringBase64 = authnRequest.getEncodedAuthnRequest();
+		String authnRequestStr = Util.base64decodedInflated(authnRequestStringBase64);
+		assertThat(authnRequestStr, containsString("<samlp:AuthnRequest"));
+		assertThat(authnRequestStr, not(containsString("AttributeConsumingServiceIndex=\"")));
+
+		// use default
+		authnRequest = new AuthnRequest(settings, new AuthnRequestParams(false, false, false,
+				AttributeConsumingServiceSelector.useDefault()));
+		authnRequestStringBase64 = authnRequest.getEncodedAuthnRequest();
+		authnRequestStr = Util.base64decodedInflated(authnRequestStringBase64);
+		assertThat(authnRequestStr, containsString("<samlp:AuthnRequest"));
+		assertThat(authnRequestStr, not(containsString("AttributeConsumingServiceIndex=\"")));
+
+		// by index
+		authnRequest = new AuthnRequest(settings, new AuthnRequestParams(false, false, false,
+				AttributeConsumingServiceSelector.byIndex(0)));
+		authnRequestStringBase64 = authnRequest.getEncodedAuthnRequest();
+		authnRequestStr = Util.base64decodedInflated(authnRequestStringBase64);
+		assertThat(authnRequestStr, containsString("<samlp:AuthnRequest"));
+		assertThat(authnRequestStr, containsString("AttributeConsumingServiceIndex=\"0\""));
+
+		// by service name
+		authnRequest = new AuthnRequest(settings, new AuthnRequestParams(false, false, false,
+				AttributeConsumingServiceSelector.byServiceName(settings, "Anagrafica")));
+		authnRequestStringBase64 = authnRequest.getEncodedAuthnRequest();
+		authnRequestStr = Util.base64decodedInflated(authnRequestStringBase64);
+		assertThat(authnRequestStr, containsString("<samlp:AuthnRequest"));
+		assertThat(authnRequestStr, containsString("AttributeConsumingServiceIndex=\"1\""));
+
+		// use service
+		authnRequest = new AuthnRequest(settings, new AuthnRequestParams(false, false, false,
+				AttributeConsumingServiceSelector.use(new AttributeConsumingService(2, false, "Test", null, null))));
+		authnRequestStringBase64 = authnRequest.getEncodedAuthnRequest();
+		authnRequestStr = Util.base64decodedInflated(authnRequestStringBase64);
+		assertThat(authnRequestStr, containsString("<samlp:AuthnRequest"));
+		assertThat(authnRequestStr, containsString("AttributeConsumingServiceIndex=\"2\""));
+	}
+
+
 
 	/**
 	 * Tests the getId method of AuthnRequest

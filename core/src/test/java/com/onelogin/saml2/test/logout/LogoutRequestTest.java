@@ -525,7 +525,7 @@ public class LogoutRequestTest {
 		String logoutRequestStr = Util.base64decodedInflated(logoutRequestStringBase64);
 		assertThat(logoutRequestStr, containsString("<samlp:LogoutRequest"));
 		String expectedNameIdStr = "ONELOGIN_1e442c129e1f822c8096086a1103c5ee2c7cae1c";
-		String nameIdStr = LogoutRequest.getNameId(logoutRequestStr, null).toString();
+		String nameIdStr = LogoutRequest.getNameId(logoutRequestStr, null);
 		assertEquals(expectedNameIdStr, nameIdStr);
 
 		logoutRequest = new LogoutRequest(settings, new LogoutRequestParams(null, null));
@@ -533,14 +533,14 @@ public class LogoutRequestTest {
 		logoutRequestStr = Util.base64decodedInflated(logoutRequestStringBase64);
 		assertThat(logoutRequestStr, containsString("<samlp:LogoutRequest"));
 		expectedNameIdStr = "http://idp.example.com/";
-		nameIdStr = LogoutRequest.getNameId(logoutRequestStr, null).toString();
+		nameIdStr = LogoutRequest.getNameId(logoutRequestStr, null);
 		assertEquals(expectedNameIdStr, nameIdStr);
 
-		nameIdStr = LogoutRequest.getNameId(logoutRequestStr).toString();
+		nameIdStr = LogoutRequest.getNameId(logoutRequestStr);
 		assertEquals(expectedNameIdStr, nameIdStr);
 
 		Document logoutRequestDoc = Util.loadXML(logoutRequestStr);
-		nameIdStr = LogoutRequest.getNameId(logoutRequestDoc).toString();
+		nameIdStr = LogoutRequest.getNameId(logoutRequestDoc);
 		assertEquals(expectedNameIdStr, nameIdStr);
 
 		// This settings file contains as IdP cert the SP cert, so I can use the getSPkey to decrypt.
@@ -549,19 +549,19 @@ public class LogoutRequestTest {
 		logoutRequestStringBase64 = logoutRequest.getEncodedLogoutRequest();
 		logoutRequestStr = Util.base64decodedInflated(logoutRequestStringBase64);
 		PrivateKey key = settings.getSPkey();
-		nameIdStr = LogoutRequest.getNameId(logoutRequestStr, key).toString();
+		nameIdStr = LogoutRequest.getNameId(logoutRequestStr, key);
 		expectedNameIdStr = "ONELOGIN_1e442c129e1f822c8096086a1103c5ee2c7cae1c";
 		assertEquals(expectedNameIdStr, nameIdStr);
 
 		String keyString = Util.getFileAsString("data/customPath/certs/sp.pem");
 		key = Util.loadPrivateKey(keyString);
 		logoutRequestStr = Util.getFileAsString("data/logout_requests/logout_request_encrypted_nameid.xml");
-		nameIdStr = LogoutRequest.getNameId(logoutRequestStr, key).toString();
+		nameIdStr = LogoutRequest.getNameId(logoutRequestStr, key);
 		expectedNameIdStr = "ONELOGIN_9c86c4542ab9d6fce07f2f7fd335287b9b3cdf69";
 		assertEquals(expectedNameIdStr, nameIdStr);
 
 		logoutRequestDoc = Util.loadXML(logoutRequestStr);
-		nameIdStr = LogoutRequest.getNameId(logoutRequestDoc, key).toString();
+		nameIdStr = LogoutRequest.getNameId(logoutRequestDoc, key);
 		assertEquals(expectedNameIdStr, nameIdStr);
 	}
 
@@ -579,7 +579,7 @@ public class LogoutRequestTest {
 
 		expectedEx.expect(SettingsException.class);
 		expectedEx.expectMessage("Key is required in order to decrypt the NameID");
-		LogoutRequest.getNameId(logoutRequestStr, null).toString();
+		LogoutRequest.getNameId(logoutRequestStr, null);
 	}
 
 	/**
@@ -670,7 +670,7 @@ public class LogoutRequestTest {
 	 * @see com.onelogin.saml2.logout.LogoutRequest#getSessionIndexes
 	 */
 	@Test
-	public void testGetSessionIndexes() throws URISyntaxException, IOException, XPathExpressionException, XMLEntityException, Error {
+	public void testGetSessionIndexes() throws Exception {
 		String logoutRequestStr = Util.getFileAsString("data/logout_requests/logout_request.xml");
 		List<String> expectedIndexes = new ArrayList<String>();
 		List <String> indexes = LogoutRequest.getSessionIndexes(logoutRequestStr);
@@ -703,9 +703,9 @@ public class LogoutRequestTest {
 	public void testGetSessionIndexesTrimming() throws IOException, XPathExpressionException  {
 		String logoutRequestStr = Util.getFileAsString("data/logout_requests/logout_request_with_whitespace.xml");
 		List <String> indexes = LogoutRequest.getSessionIndexes(logoutRequestStr, true);
-		assertEquals(Arrays.asList("_ac72a76526cb6ca19f8438e73879a0e6c8ae5131"), indexes);
+		assertEquals(List.of("_ac72a76526cb6ca19f8438e73879a0e6c8ae5131"), indexes);
 		indexes = LogoutRequest.getSessionIndexes(logoutRequestStr, false);
-		assertEquals(Arrays.asList("\n\t\t_ac72a76526cb6ca19f8438e73879a0e6c8ae5131\n\t"), indexes);
+		assertEquals(List.of("\n\t\t_ac72a76526cb6ca19f8438e73879a0e6c8ae5131\n\t"), indexes);
 	}
 
 	/**

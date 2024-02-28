@@ -315,7 +315,7 @@ public class UtilsTest {
 		Document docResponseOk = Util.loadXML(responseOk);
 		String responseString = Util.convertDocumentToString(docResponseOk , true);
 		assertNotNull(responseString);
-		assertTrue(responseString.length() == 6855);
+        assertEquals(6855, responseString.length());
 	}
 	
 	/**
@@ -333,8 +333,8 @@ public class UtilsTest {
 		Document docResponseOk = Util.loadXML(responseOk);
 		String responseString = Util.convertDocumentToString(docResponseOk , false);
 		String responseString2 = Util.convertDocumentToString(docResponseOk);
-		assertNotNull(responseString);		
-		assertTrue(responseString.length() == 6855);
+		assertNotNull(responseString);
+        assertEquals(6855, responseString.length());
 		assertTrue(responseString.contentEquals(responseString2));
 	}
 
@@ -798,8 +798,8 @@ public class UtilsTest {
 		String encodedAuthNRequest = Util.getFileAsString("data/requests/authn_request.xml.base64");
 		String deflatedEncodedAuthNRequest = Util.getFileAsString("data/requests/authn_request.xml.deflated.base64");
 
-		assertThat(authNRequest.toString(), equalTo(Util.base64decodedInflated(encodedAuthNRequest).toString()));
-		assertThat(authNRequest.toString(), equalTo(Util.base64decodedInflated(deflatedEncodedAuthNRequest).toString()));
+		assertThat(authNRequest, equalTo(Util.base64decodedInflated(encodedAuthNRequest)));
+		assertThat(authNRequest, equalTo(Util.base64decodedInflated(deflatedEncodedAuthNRequest)));
 	}
 
 	/**
@@ -816,7 +816,7 @@ public class UtilsTest {
 		String samlResponse = Util.getFileAsString("data/responses/response_long_cert.xml");
 		String deflatedEncodedsamlResponse = Util.getFileAsString("data/responses/response_long_cert.xml.deflated.base64");
 
-		assertThat(samlResponse.toString(), equalTo(Util.base64decodedInflated(deflatedEncodedsamlResponse).toString()));
+		assertThat(samlResponse, equalTo(Util.base64decodedInflated(deflatedEncodedsamlResponse)));
 	}
 	
 	/**
@@ -832,7 +832,7 @@ public class UtilsTest {
 		String authNRequest = Util.getFileAsString("data/requests/authn_request.xml"); 
 		String deflatedEncodedAuthNRequest = Util.getFileAsString("data/requests/authn_request.xml.deflated.base64");
 
-		assertThat(Util.deflatedBase64encoded(authNRequest).toString(), equalTo(deflatedEncodedAuthNRequest.toString()));
+		assertThat(Util.deflatedBase64encoded(authNRequest), equalTo(deflatedEncodedAuthNRequest));
 	}
 	
 	/**
@@ -848,7 +848,7 @@ public class UtilsTest {
 		String authNRequest = Util.getFileAsString("data/requests/authn_request.xml"); 
 		String encodedAuthNRequest = Util.getFileAsString("data/requests/authn_request.xml.base64");
 		
-		assertThat(Util.base64encoder(authNRequest).toString(), equalTo(encodedAuthNRequest.toString()));
+		assertThat(Util.base64encoder(authNRequest), equalTo(encodedAuthNRequest));
 	}
 	
 	/**
@@ -864,7 +864,7 @@ public class UtilsTest {
 		String authNRequest = Util.getFileAsString("data/requests/authn_request.xml"); 
 		String encodedAuthNRequest = Util.getFileAsString("data/requests/authn_request.xml.base64");
 		
-		assertThat(authNRequest.toString(), equalTo(new String(Util.base64decoder(encodedAuthNRequest))));
+		assertThat(authNRequest, equalTo(new String(Util.base64decoder(encodedAuthNRequest))));
 	}
 	
 	/**
@@ -880,7 +880,7 @@ public class UtilsTest {
 		String deflatedEncodedAuthNRequest = Util.getFileAsString("data/requests/authn_request.xml.deflated.base64");
 		
 		assertEquals("pVNNj9owEL3vr4h8hxCSCmJtkCjbDyQKKdAeeqm8zqRryR%2Bpx9ml%2F752YFv3sBy2cxzPzHvz3vgWmZIdXfbuQe%2FhZw%2FokpOSGunwUJHeamoYCqSaKUDqOD0sP23odDyhnTXOcCNJsr6ryPfd9t1m92G9zSZ5MZ2Xk5LdAy%2BmRcvezPPprJ2Vxawo5wVJvoJFYXRF%2FBTfjNjDWqNj2vnUJCtGWTbK8mOW0bykefGNJO%2BN5TCwrEjLJEJoqxmieIQ%2FmfrC563QjdA%2FrpO%2FPxch%2FXg81qN6dziSZIkI1nlmK6OxV2APYB8Fhy%2F7TUUenOtomsKJqU7CmBuVMo5kcZP4uA1y0WETGwl4nQJ7hrsMCXFBEU03jpEUONYwx85gaYQW4Xd06zHWd7WRgv96jY9eZsXc9eqQEc2oHUppF6xEB9qR5FAH%2FM89k6IVYCsSbeDFldI8rSww5x1ztveGpf%2BQv9wfNIPP3gIHp1dd48qojlmB4cI8Be4ifc9GxQgr6X3YQ%2FtftoW42sMpDzg%2BHa72ydjmL6X0RU6LyO8XBFrcPD%2FHn3jxGw%3D%3D", Util.urlEncoder(deflatedEncodedAuthNRequest));
-		assertEquals(null, Util.urlEncoder(null));
+        assertNull(Util.urlEncoder(null));
 	}
 	
 	/**
@@ -895,8 +895,8 @@ public class UtilsTest {
 	public void testUrlDecoder() throws URISyntaxException, IOException {
 		String deflatedEncodedAuthNRequest = Util.getFileAsString("data/requests/authn_request.xml.deflated.base64");
 		
-		assertEquals(deflatedEncodedAuthNRequest, Util.urlDecoder("pVNNj9owEL3vr4h8hxCSCmJtkCjbDyQKKdAeeqm8zqRryR%2Bpx9ml%2F752YFv3sBy2cxzPzHvz3vgWmZIdXfbuQe%2FhZw%2FokpOSGunwUJHeamoYCqSaKUDqOD0sP23odDyhnTXOcCNJsr6ryPfd9t1m92G9zSZ5MZ2Xk5LdAy%2BmRcvezPPprJ2Vxawo5wVJvoJFYXRF%2FBTfjNjDWqNj2vnUJCtGWTbK8mOW0bykefGNJO%2BN5TCwrEjLJEJoqxmieIQ%2FmfrC563QjdA%2FrpO%2FPxch%2FXg81qN6dziSZIkI1nlmK6OxV2APYB8Fhy%2F7TUUenOtomsKJqU7CmBuVMo5kcZP4uA1y0WETGwl4nQJ7hrsMCXFBEU03jpEUONYwx85gaYQW4Xd06zHWd7WRgv96jY9eZsXc9eqQEc2oHUppF6xEB9qR5FAH%2FM89k6IVYCsSbeDFldI8rSww5x1ztveGpf%2BQv9wfNIPP3gIHp1dd48qojlmB4cI8Be4ifc9GxQgr6X3YQ%2FtftoW42sMpDzg%2BHa72ydjmL6X0RU6LyO8XBFrcPD%2FHn3jxGw%3D%3D"));		
-		assertEquals(null, Util.urlDecoder(null));
+		assertEquals(deflatedEncodedAuthNRequest, Util.urlDecoder("pVNNj9owEL3vr4h8hxCSCmJtkCjbDyQKKdAeeqm8zqRryR%2Bpx9ml%2F752YFv3sBy2cxzPzHvz3vgWmZIdXfbuQe%2FhZw%2FokpOSGunwUJHeamoYCqSaKUDqOD0sP23odDyhnTXOcCNJsr6ryPfd9t1m92G9zSZ5MZ2Xk5LdAy%2BmRcvezPPprJ2Vxawo5wVJvoJFYXRF%2FBTfjNjDWqNj2vnUJCtGWTbK8mOW0bykefGNJO%2BN5TCwrEjLJEJoqxmieIQ%2FmfrC563QjdA%2FrpO%2FPxch%2FXg81qN6dziSZIkI1nlmK6OxV2APYB8Fhy%2F7TUUenOtomsKJqU7CmBuVMo5kcZP4uA1y0WETGwl4nQJ7hrsMCXFBEU03jpEUONYwx85gaYQW4Xd06zHWd7WRgv96jY9eZsXc9eqQEc2oHUppF6xEB9qR5FAH%2FM89k6IVYCsSbeDFldI8rSww5x1ztveGpf%2BQv9wfNIPP3gIHp1dd48qojlmB4cI8Be4ifc9GxQgr6X3YQ%2FtftoW42sMpDzg%2BHa72ydjmL6X0RU6LyO8XBFrcPD%2FHn3jxGw%3D%3D"));
+        assertNull(Util.urlDecoder(null));
 	}
 	
 	/**
@@ -1031,7 +1031,7 @@ public class UtilsTest {
 		String doubleSignedResponseStr = Util.getFileAsString("data/responses/signed_assertion_response.xml.base64");
 		String samlDoubleSignedResponseStr = new String(Util.base64decoder(doubleSignedResponseStr));
 		Document samlDoubleSignedResponseDocument = Util.loadXML(samlDoubleSignedResponseStr);
-		Node assertionElement = (Node) samlDoubleSignedResponseDocument.getFirstChild().getFirstChild().getNextSibling().getNextSibling();
+		Node assertionElement = samlDoubleSignedResponseDocument.getFirstChild().getFirstChild().getNextSibling().getNextSibling();
 		assertFalse(Util.validateSignNode(assertionElement, cert, null, null));
 
 		// No Signature
@@ -1666,8 +1666,8 @@ public class UtilsTest {
 		Document authNRequestDoc_3 = Util.loadXML(authNRequest);
 		String authNRequestSigned_3 = Util.addSign(authNRequestDoc_3, key, cert, "");
 
-		assertThat(authNRequestSigned.toString(), equalTo(authNRequestSigned_2.toString()));
-		assertThat(authNRequestSigned.toString(), equalTo(authNRequestSigned_3.toString()));
+		assertThat(authNRequestSigned, equalTo(authNRequestSigned_2));
+		assertThat(authNRequestSigned, equalTo(authNRequestSigned_3));
 		
 		// No ID
 		String authNRequestNoID = authNRequest.replace("_ONELOGIN103428909abec424fa58327f79474984", "");
@@ -1703,8 +1703,8 @@ public class UtilsTest {
 
 		Document logoutResponseSignedDoc = Util.loadXML(logoutResponseSigned);
 		assertEquals("samlp:LogoutResponse", logoutResponseSignedDoc.getFirstChild().getNodeName());
-		Node ds_signature_logout_response = logoutResponseSignedDoc.getFirstChild().getFirstChild().getNextSibling().getNextSibling();;
-		assertEquals("ds:Signature", ds_signature_logout_response.getNodeName());
+		Node ds_signature_logout_response = logoutResponseSignedDoc.getFirstChild().getFirstChild().getNextSibling().getNextSibling();
+        assertEquals("ds:Signature", ds_signature_logout_response.getNodeName());
 		Node canonization_logout_response_signed = ds_signature_logout_response.getFirstChild().getFirstChild();
 		assertEquals("ds:CanonicalizationMethod", canonization_logout_response_signed.getNodeName());
 		assertEquals(Constants.C14NEXC, canonization_logout_response_signed.getAttributes().getNamedItem("Algorithm").getNodeValue());
@@ -2015,26 +2015,26 @@ public class UtilsTest {
 		assertEquals(0, Util.getExpireTime(null, null));
 		assertEquals(0, Util.getExpireTime("", ""));
 
-		assertEquals(num, (long)Util.getExpireTime(null, num));
-		assertEquals(num, (long)Util.getExpireTime("", num));
+		assertEquals(num, Util.getExpireTime(null, num));
+		assertEquals(num, Util.getExpireTime("", num));
 
-		assertEquals(num2, (long)Util.getExpireTime(null, num2));
-		assertEquals(num2, (long)Util.getExpireTime("", num2));
+		assertEquals(num2, Util.getExpireTime(null, num2));
+		assertEquals(num2, Util.getExpireTime("", num2));
 
-		assertEquals(num, (long)Util.getExpireTime(null, "2010-12-10T04:39:31Z"));
-		assertEquals(num, (long)Util.getExpireTime("", "2010-12-10T04:39:31Z"));
+		assertEquals(num, Util.getExpireTime(null, "2010-12-10T04:39:31Z"));
+		assertEquals(num, Util.getExpireTime("", "2010-12-10T04:39:31Z"));
 
-		assertEquals(num2, (long)Util.getExpireTime(null, "2074-12-10T04:39:31Z"));
-		assertEquals(num2, (long)Util.getExpireTime("", "2074-12-10T04:39:31Z"));
+		assertEquals(num2, Util.getExpireTime(null, "2074-12-10T04:39:31Z"));
+		assertEquals(num2, Util.getExpireTime("", "2074-12-10T04:39:31Z"));
 
-		assertEquals(num, (long)Util.getExpireTime("PT360000S", "2010-12-10T04:39:31Z"));
-		assertNotEquals(num2, (long)Util.getExpireTime("PT360000S", "2074-12-10T04:39:31Z"));
+		assertEquals(num, Util.getExpireTime("PT360000S", "2010-12-10T04:39:31Z"));
+		assertNotEquals(num2, Util.getExpireTime("PT360000S", "2074-12-10T04:39:31Z"));
 
 		long x = Util.getExpireTime("PT360000S", num);
-		assertEquals(num, (long)Util.getExpireTime("PT360000S", num));
-		assertNotEquals(num2, (long)Util.getExpireTime("PT360000S", num2));
+		assertEquals(num, Util.getExpireTime("PT360000S", num));
+		assertNotEquals(num2, Util.getExpireTime("PT360000S", num2));
 
-		assertNotEquals(0, (long)Util.getExpireTime("PT360000S", null));
+		assertNotEquals(0, Util.getExpireTime("PT360000S", null));
 	}
     
 	/**

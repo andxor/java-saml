@@ -1,8 +1,6 @@
 package com.onelogin.saml2.model;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * Contact class of Java Toolkit.
@@ -40,6 +38,21 @@ public class Contact {
 	 */
 	private final List<String> telephoneNumbers;
 
+
+	private final String pivaAggregatore;
+
+	private final String fiscalCode;
+
+	private final CessionarioCommittente cessionarioCommittente;
+
+	private final String spidEntityType;
+
+	private final List<String> tags;
+
+	public CessionarioCommittente getCessionarioCommittente() {
+		return cessionarioCommittente;
+	}
+
 	/**
 	 * Constructor to specify minimal contact data.
 	 * <p>
@@ -57,7 +70,7 @@ public class Contact {
 	@Deprecated
 	public Contact(String contactType, String givenName, String emailAddress) {
 		this(contactType, null, givenName != null ? givenName : "", null,
-		            Arrays.asList(emailAddress != null ? emailAddress : ""), null);
+                List.of(emailAddress != null ? emailAddress : ""), null);
 	}
 
 	/**
@@ -77,12 +90,28 @@ public class Contact {
 	 *              Contact phone numbers
 	 */
 	public Contact(String contactType, String company, String givenName, String surName, List<String> emailAddresses, List<String> telephoneNumbers) {
+		 this(contactType, company, givenName, surName, emailAddresses, telephoneNumbers, null, null, null, null, Collections.emptyList());
+	}
+
+
+	public Contact(String contactType, String company, String givenName, String surName, List<String> emailAddresses,
+				   List<String> telephoneNumbers, String fiscalCode, String pIva, CessionarioCommittente cessionarioCommittente,
+				   String spidContactType, List<String> tags) {
 		this.contactType = contactType != null? contactType : "";
 		this.company = company;
 		this.givenName = givenName;
 		this.surName = surName;
 		this.emailAddresses = emailAddresses != null? emailAddresses: Collections.emptyList();
 		this.telephoneNumbers = telephoneNumbers != null? telephoneNumbers: Collections.emptyList();
+		this.fiscalCode = fiscalCode;
+		this.pivaAggregatore = pIva;
+		this.cessionarioCommittente = cessionarioCommittente;
+		this.spidEntityType = spidContactType;
+		this.tags = tags;
+	}
+
+	public String getSpidEntityType() {
+		return spidEntityType;
 	}
 
 	/**
@@ -134,5 +163,17 @@ public class Contact {
 	 */
 	public final List<String> getTelephoneNumbers() {
 		return telephoneNumbers;
+	}
+
+	public String getPivaAggregatore() {
+		return pivaAggregatore;
+	}
+
+	public String getFiscalCode() {
+		return fiscalCode;
+	}
+
+	public List<String> getTags() {
+		return tags;
 	}
 }

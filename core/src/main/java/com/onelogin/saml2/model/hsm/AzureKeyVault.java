@@ -14,12 +14,12 @@ import java.util.HashMap;
 
 public class AzureKeyVault extends HSM {
 
-	private String clientId;
-	private String clientCredentials;
-	private String tenantId;
-	private String keyVaultId;
+	private final String clientId;
+	private final String clientCredentials;
+	private final String tenantId;
+	private final String keyVaultId;
 	private CryptographyClient akvClient;
-	private HashMap<String, KeyWrapAlgorithm> algorithmMapping;
+	private final HashMap<String, KeyWrapAlgorithm> algorithmMapping;
 
 	/**
 	 * Constructor to initialise an HSM object.

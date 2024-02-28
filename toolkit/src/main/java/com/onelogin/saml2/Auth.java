@@ -14,8 +14,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import com.onelogin.saml2.exception.ValidationError;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -59,17 +60,17 @@ public class Auth {
 	/**
 	 * Settings data.
 	 */
-	private Saml2Settings settings;
+	private final Saml2Settings settings;
 
 	/**
 	 * HttpServletRequest object to be processed (Contains GET and POST parameters, session, ...).
 	 */
-	private HttpServletRequest request;
+	private final HttpServletRequest request;
 
 	/**
 	 * HttpServletResponse object to be used (For example to execute the redirections).
 	 */
-	private HttpServletResponse response;
+	private final HttpServletResponse response;
 
 	/**
 	 * NameID.
@@ -134,7 +135,7 @@ public class Auth {
 	/**
 	 * Stores any error.
 	 */
-	private List<String> errors = new ArrayList<String>();
+	private final List<String> errors = new ArrayList<String>();
 
 	/**
 	 * Reason of the last error.
@@ -168,6 +169,7 @@ public class Auth {
 	 * encrypted, by default tries to return the decrypted XML
 	 */
 	private String lastResponse;
+	private SamlResponse samlResponse;
 
 	private static final SamlMessageFactory DEFAULT_SAML_MESSAGE_FACTORY = new SamlMessageFactory() {};
 
@@ -180,7 +182,7 @@ public class Auth {
 	 * @throws SettingsException
 	 * @throws Error
 	 */
-	public Auth() throws IOException, SettingsException, Error {
+	public Auth() throws Exception {
 		this(new SettingsBuilder().fromFile("onelogin.saml.properties").build(), null, null);
 	}
 
@@ -193,7 +195,7 @@ public class Auth {
 	 * @throws SettingsException
 	 * @throws Error
 	 */
-	public Auth(KeyStoreSettings keyStoreSetting) throws IOException, SettingsException, Error {
+	public Auth(KeyStoreSettings keyStoreSetting) throws Exception {
 		this("onelogin.saml.properties", keyStoreSetting);
 	}
 
@@ -206,7 +208,7 @@ public class Auth {
 	 * @throws SettingsException
 	 * @throws Error
 	 */
-	public Auth(String filename) throws IOException, SettingsException, Error {
+	public Auth(String filename) throws Exception {
 		this(filename, null, null, null);
 	}
 
@@ -221,7 +223,7 @@ public class Auth {
 	 * @throws Error
 	 */
 	public Auth(String filename, KeyStoreSettings keyStoreSetting)
-			throws IOException, SettingsException, Error {
+			throws Exception {
 		this(new SettingsBuilder().fromFile(filename, keyStoreSetting).build(), null, null);
 	}
 
@@ -235,7 +237,7 @@ public class Auth {
 	 * @throws SettingsException
 	 * @throws Error
 	 */
-	public Auth(HttpServletRequest request, HttpServletResponse response) throws IOException, SettingsException, Error {
+	public Auth(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		this(new SettingsBuilder().fromFile("onelogin.saml.properties").build(), request, response);
 	}
 
@@ -251,7 +253,7 @@ public class Auth {
 	 * @throws Error
 	 */
 	public Auth(KeyStoreSettings keyStoreSetting, HttpServletRequest request, HttpServletResponse response)
-			throws IOException, SettingsException, Error {
+			throws Exception {
 		this(new SettingsBuilder().fromFile("onelogin.saml.properties", keyStoreSetting).build(), request,
 				response);
 	}
@@ -268,7 +270,7 @@ public class Auth {
 	 * @throws Error
 	 */
 	public Auth(String filename, HttpServletRequest request, HttpServletResponse response)
-			throws SettingsException, IOException, Error {
+			throws Exception {
 		this(filename, null, request, response);
 	}
 
@@ -285,7 +287,7 @@ public class Auth {
 	 * @throws Error
 	 */
 	public Auth(String filename, KeyStoreSettings keyStoreSetting, HttpServletRequest request,
-			HttpServletResponse response) throws SettingsException, IOException, Error {
+			HttpServletResponse response) throws Exception {
 		this(new SettingsBuilder().fromFile(filename, keyStoreSetting).build(), request, response);
 	}
 
@@ -1188,6 +1190,10 @@ public class Auth {
 		return settings.getIdpSingleLogoutServiceResponseUrl().toString();
 	}
 
+	public SamlResponse getSamlResponse() {
+		return samlResponse;
+	}
+
 	/**
 	 * Process the SAML Response sent by the IdP.
 	 *
@@ -1202,6 +1208,7 @@ public class Auth {
 
 		if (samlResponseParameter != null) {
 			SamlResponse samlResponse = samlMessageFactory.createSamlResponse(settings, httpRequest);
+			this.samlResponse = samlResponse;
 			lastResponse = samlResponse.getSAMLResponseXml();
 
 			if (samlResponse.isValid(requestId)) {
@@ -1209,7 +1216,6 @@ public class Auth {
 				nameidFormat = samlResponse.getNameIdFormat();
 				nameidNameQualifier = samlResponse.getNameIdNameQualifier();
 				nameidSPNameQualifier = samlResponse.getNameIdSPNameQualifier();
-				authenticated = true;
 				attributes = samlResponse.getAttributes();
 				sessionIndex = samlResponse.getSessionIndex();
 				sessionExpiration = samlResponse.getSessionNotOnOrAfter();
@@ -1217,12 +1223,17 @@ public class Auth {
 				lastMessageIssueInstant = samlResponse.getResponseIssueInstant();
 				lastAssertionId = samlResponse.getAssertionId();
 				lastAssertionNotOnOrAfter = samlResponse.getAssertionNotOnOrAfter();
+				authenticated = true;
 				LOGGER.debug("processResponse success --> " + samlResponseParameter);
 			} else {
 				errorReason = samlResponse.getError();
 				validationException = samlResponse.getValidationException();
 				SamlResponseStatus samlResponseStatus = samlResponse.getResponseStatus();
-				if (samlResponseStatus.getStatusCode() == null || !samlResponseStatus.getStatusCode().equals(Constants.STATUS_SUCCESS)) {
+				if (samlResponseStatus == null) {
+					errors.add("invalid_response");
+					LOGGER.error("processResponse error. invalid_response. Missing response status");
+					LOGGER.debug(" --> " + samlResponseParameter);
+				} else if (samlResponseStatus.getStatusCode() == null || !samlResponseStatus.getStatusCode().equals(Constants.STATUS_SUCCESS)) {
 					errors.add("response_not_success");
 					LOGGER.error("processResponse error. sso_not_success");
 					LOGGER.debug(" --> " + samlResponseParameter);
